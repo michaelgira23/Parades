@@ -1,0 +1,27 @@
+{
+  "name": "parades",
+  "version": "1.0.0",
+  "description": "A mix of pictionary and charades. Also called Charictionary.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/michaelgira23/Parades.git"
+  },
+  "keywords": [
+    "Parades",
+    "Charictionary"
+  ],
+  "author": "Michael Gira",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/michaelgira23/Parades/issues"
+  },
+  "homepage": "https://github.com/michaelgira23/Parades#readme",
+  "dependencies": {
+    "express": "^4.13.4",
+    "socket.io": "^1.4.5"
+  }
+}
