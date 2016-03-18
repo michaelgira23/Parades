@@ -2,8 +2,70 @@
 <html>
 	<head>
 		<title>Parades</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+		
+		<style>
+			@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800);
+			
+			html, body {
+				height: 100%;
+				font-family: 'Open Sans', sans-serif;
+			}
+			
+			/* Spinner Frame */
+			
+			.spinner-frame {
+				height: 100%;
+				width: 100%;
+				position: relative;
+				
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+			}
+			
+			.spinner {
+				margin: 0;
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				
+/*				overflow: hidden;*/
+			}
+			
+			.spinner .card {
+				margin: 0;
+				padding: 0.5em;
+				width: 100%;
+				white-space: nowrap;
+			}
+			
+			.spinner-trigger {
+				margin-top: 1em;
+			}
+		</style>
 	</head>
 	<body>
+		<div class="spinner-frame">
+			<h3>Superheroes</h3>
+			<div class="spinner card col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-4">
+				<div class="card">Something</div>
+				<div class="card">Another thing</div>
+				<div class="card">Another tafdhing</div>
+				<div class="card">Anotherhi thing</div>
+				<div class="card card-success">SPOODERMAN</div>
+				<div class="card">Something</div>
+				<div class="card">Another thing</div>
+				<div class="card">Another tafdhing</div>
+				<div class="card">Anotherhi thing</div>
+			</div>
+			<button class="spinner-trigger btn btn-info">Spin!</button>
+		</div>
 		
+		<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/js/bootstrap.min.js" integrity="sha384-vZ2WRJMwsjRMW/8U7i6PWi6AlO1L79snBrmgiDpgIWJ82z8eA5lenwvxbMV1PAh7" crossorigin="anonymous"></script>
+		<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+		<script src="/js/spinner.js"></script>
 	</body>
 </html>
