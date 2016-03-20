@@ -1,0 +1,190 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800);
+
+html, body {
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.frame {
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    right: -100vw;
+}
+
+/* Menu */
+
+.menu-frame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu-title {
+    margin-bottom: 1em;
+}
+
+.menu-title small {
+    position: absolute;
+}
+
+.menu-title h1 {
+    position: relative;
+    top: -100vh;
+}
+
+.menu-selections {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-selections div {
+    height: 8em;
+    width: 8em;
+    margin: 0 0.5em;
+    padding: 0.5em;
+    top: -1em;
+    
+    text-align: center;
+    display: flex;
+    align-items: center;justify-content: center;
+    
+    cursor: pointer;
+}
+
+.active .menu-selections div:first-child {
+    animation-name: passiveMove;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+.active .menu-selections div:last-child {
+    animation-name: passiveMove;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+.active .menu-selections div:last-child {
+    
+}
+
+@media(max-width: 360px) {
+    
+    .menu-title h1 {
+        font-size: 5rem;
+    }
+    
+    .menu-selections div:first-child {
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+    
+    .menu-selections div:last-child {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        
+    }
+}
+
+@media(min-width: 361px) {
+    
+    .menu-selections {
+        flex-direction: row;
+    }
+
+    .menu-selections div:last-child {
+        animation-delay: 0.5s;
+    }
+}
+
+@keyframes passiveMove {
+    0%   { top: -1em; }
+    100% { top: 1em;  }
+}
+
+/* Create Game */
+
+.createGame-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.createGame-frame .createGame-header {
+    width: 100vw;
+}
+
+.createGame-frame .back-to-menu {
+    display: inline-block;
+    padding-left: 0.5rem;
+    cursor: pointer;
+}
+
+.createGame-frame .gamecode {
+    text-align: center;
+    line-height: 2.5rem;
+}
+
+.createGame-frame .gamecode strong {
+    font-size: 4.5em;
+}
+
+.createGame-frame .createGame-options {
+    overflow-y: scroll;
+}
+
+.createGame-frame .createGame-options .createGame-categories {
+    padding: 1em 0.5em;
+}
+
+.createGame-frame .createGame-options .createGame-categories .createGame-toggleCategories {
+    margin-bottom: 0.5em;
+}
+
+.createGame-frame .createGame-options .createGame-categories .createGame-categorySelection {
+    padding: 0;
+}
+
+.createGame-frame .createGame-options .createGame-categories .createGame-categorySelection label {
+    margin: 0;
+    width: 100%;
+    
+    cursor: pointer;
+}
+
+/* Spinner Frame */
+
+.spinner-frame {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.spinner {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
+    overflow: hidden;
+}
+
+.spinner .card {
+    margin: 0;
+    padding: 0.5em;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.spinner .card.chosen {
+    transition-duration: 0.5s;
+}
+
+.spinner-trigger {
+    margin-top: 1em;
+}

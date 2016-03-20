@@ -9,7 +9,7 @@ var io      = require('socket.io');
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res) {
-	res.sendFile(__dirname + '/html/index.html');
+	res.sendFile(__dirname + '/html/game.html');
 });
 
 server.listen(port, function() {
