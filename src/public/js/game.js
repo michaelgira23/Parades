@@ -36,19 +36,21 @@ var $createFrame = $('.createGame-frame');
 function showMenu() {
     $titleHeader.css('top', '-100vh');
     $frames.removeClass('active');
-    $menuFrame.addClass('active');
     
     $frames.not('.menu-frame').animate({
         right: '-100vw'
-    }, 1500, 'easeOutCubic');
-    
-    $menuFrame.animate({
-        left: 0
-    }, 1500, 'easeOutCubic');
-    
-    $titleHeader.animate({
-        top: 0
-    }, 1500, 'easeOutBounce');
+    }, 600, 'easeOutCubic', function() {
+        
+        $menuFrame.animate({
+            left: 0
+        }, 600, 'easeOutCubic', function() {
+            $menuFrame.addClass('active');
+        });
+        
+        $titleHeader.animate({
+            top: 0
+        }, 1500, 'easeOutBounce');
+    });
     
     $createGame.click(createGame);
     $joinGame.click(joinGame);
@@ -56,15 +58,18 @@ function showMenu() {
 
 function createGame() {
     $frames.removeClass('active');
-    $createFrame.addClass('active');
     
     $menuFrame.animate({
         left: '-100vw'
-    }, 1500, 'easeOutCubic');
+    }, 600, 'easeOutCubic', function() {
+        
+        $createFrame.animate({
+            right: 0
+        }, 600, 'easeOutCubic', function() {
+            $createFrame.addClass('active');
+        });
+    });
     
-    $createFrame.animate({
-        right: 0
-    }, 1500, 'easeOutCubic');
 }
 
 function joinGame() {

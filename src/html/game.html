@@ -41,9 +41,24 @@
             <button class="btn btn-success btn-lg">Start Game!</button>
             
             <div class="createGame-options">
-                <div class="createGame-categories col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-4">
+                <div class="createGame-selectOptions col-xs-12 col-lg-4">
+                    <button class="createGame-toggleOptions btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-variousOptions">Options</button>
+                    <div class="createGame-variousOptions collapse">
+                        <h3>Time each Round</h3>
+                        <select class="form-control" name="roundTime">
+                            <option value="30">0:30</option>
+                            <option value="60">1:00</option>
+                            <option value="90">1:30</option>
+                            <option value="120">2:00</option>
+                            <option value="150">2:30</option>
+                            <option value="180">3:00</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="createGame-categories col-xs-12 col-lg-4">
                     <button class="createGame-toggleCategories btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-categorySelection">Choose Categories</button>
-                    <ul class="createGame-categorySelection list-group collapse in">
+                    <ul class="createGame-categorySelection list-group collapse">
                         <li class="list-group-item">
                             <label>
                                 <input type="checkbox" checked>
@@ -59,14 +74,17 @@
                     </ul>
                 </div>
 
-                <div class="createGame-chooseTeams col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-4">
+                <div class="createGame-chooseTeams col-xs-12 col-lg-4">
                     <button class="createGame-toggleTeams btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-teams">Choose Teams</button>
                     <div class="createGame-teams collapse">
+                        <p>Click on the names to switch what team they're on!</p>
+                        <h3><strong>Blue</strong> Team</h3>
                         <ul class="createGame-teamBlue">
                             <li class="list-group-item list-group-item-info">Michael</li>
                             <li class="list-group-item list-group-item-info">Paul</li>
                             <li class="list-group-item list-group-item-info">Gira</li>
                         </ul>
+                        <h3><strong>Red</strong> Team</h3>
                         <ul class="createGame-teamRed">
                             <li class="list-group-item list-group-item-danger">Michael</li>
                             <li class="list-group-item list-group-item-danger">Paul</li>
