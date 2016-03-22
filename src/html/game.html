@@ -26,7 +26,7 @@
                 <h1 class="display-1">Parades</h1>
             </div>
             <div class="menu-selections">
-                <div class="card card-inverse card-primary">
+                <div class="card card-inverse card-info">
                     <span>Create a Game</span>
                 </div>
                 <div class="card card-inverse card-danger">
@@ -37,69 +37,124 @@
         
         <!-- Create Game -->
         <div class="frame createGame-frame">
-            <div class="createGame-header">
+            <div class="back-header">
                 <div class="back-to-menu display-4">
                     <i class="fa fa-angle-left"></i> Back
                 </div>
             </div>
-<!--            <p class="gamecode display-6">Your game code is <strong>12345</strong></p>-->
-            <button class="btn btn-success btn-lg">Start Game!</button>
-            
-            <div class="createGame-options">
-                <div class="createGame-selectOptions col-xs-12 col-lg-4">
-                    <button class="createGame-toggleOptions btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-variousOptions">Options</button>
-                    <div class="createGame-variousOptions collapse">
-                        <h3>Time each Round</h3>
-                        <select class="form-control" name="roundTime">
-                            <option value="30">0:30</option>
-                            <option value="60">1:00</option>
-                            <option value="90">1:30</option>
-                            <option value="120">2:00</option>
-                            <option value="150">2:30</option>
-                            <option value="180">3:00</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="createGame-categories col-xs-12 col-lg-4">
-                    <button class="createGame-toggleCategories btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-categorySelection">Choose Categories</button>
-                    <ul class="createGame-categorySelection list-group collapse">
-                        <li class="list-group-item">
-                            <label>
-                                <input type="checkbox" checked>
-                                Superheroes
-                            </label>
-                        </li>
-                        <li class="list-group-item">
-                            <label>
-                                <input type="checkbox" checked>
-                                Cool people
-                            </label>
-                        </li>
+            <button class="createGame-start btn btn-success btn-lg">Start Game!</button>
+            <div class="createGame-options card col-xs-11 col-sm-8 col-md-6 col-lg-4">
+                <h1>Options</h1>
+                <span class="divider"></span>
+                <h3>Time each round</h3>
+                <select class="c-select" name="roundTime">
+                    <option value="60">1:00</option>
+                    <option value="90">1:30</option>
+                    <option value="120">2:00</option>
+                    <option value="150">2:30</option>
+                    <option value="280">3:00</option>
+                </select>
+                <h3>Categories</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <label>
+                            <input type="checkbox">
+                            Superheroes
+                        </label>
+                    </li>
+                    <li class="list-group-item">
+                        <label>
+                            <input type="checkbox">
+                            Cool People
+                        </label>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Game Code -->
+        <div class="frame gameCode-frame">
+            <small>Game code</small>
+            <h1 class="gameCode-code display-1">12345</h1>
+            <button class="gameCode-ready btn btn-primary btn-lg">All ready!</button>
+            <button class="gameCode-cancel btn btn-danger-outline btn-sm">Cancel</button>
+            <div class="gameCode-teamList">
+                <div class="gameCode-teamBlue col-xs-12 col-md-5 col-lg-4">
+                    <h3>Team <strong>Blue</strong></h3>
+                    <ul>
+                        <li class="list-group-item list-group-item-info">Michael</li>
+                        <li class="list-group-item list-group-item-info">Paul</li>
+                        <li class="list-group-item list-group-item-info">Gira</li>
                     </ul>
                 </div>
-
-                <div class="createGame-chooseTeams col-xs-12 col-lg-4">
-                    <button class="createGame-toggleTeams btn btn-secondary-outline" data-toggle="collapse" data-target=".createGame-teams">Choose Teams</button>
-                    <div class="createGame-teams collapse">
-                        <p>Click on the names to switch what team they're on!</p>
-                        <h3><strong>Blue</strong> Team</h3>
-                        <ul class="createGame-teamBlue">
-                            <li class="list-group-item list-group-item-info">Michael</li>
-                            <li class="list-group-item list-group-item-info">Paul</li>
-                            <li class="list-group-item list-group-item-info">Gira</li>
-                        </ul>
-                        <h3><strong>Red</strong> Team</h3>
-                        <ul class="createGame-teamRed">
-                            <li class="list-group-item list-group-item-danger">Michael</li>
-                            <li class="list-group-item list-group-item-danger">Paul</li>
-                            <li class="list-group-item list-group-item-danger">Gira</li>
-                        </ul>
-                    </div>
+                <div class="gameCode-teamRed col-xs-12 col-md-5 col-lg-4">
+                    <h3>Team <strong>Red</strong></h3>
+                    <ul>
+                        <li class="list-group-item list-group-item-danger">Michael</li>
+                        <li class="list-group-item list-group-item-danger">Paul</li>
+                        <li class="list-group-item list-group-item-danger">Gira</li>
+                    </ul>
                 </div>
             </div>
         </div>
-
+        
+        <!-- Join Game -->
+        <div class="frame joinGame-frame">
+            <div class="back-header">
+                <div class="back-to-menu display-4">
+                    <i class="fa fa-angle-left"></i> Back
+                </div>
+            </div>
+            
+            <h1 class="display-4">Gamecode</h1>
+            <input class="form-control form-control-lg" name="gamecode">
+            <button class="btn btn-primary">Let's Go!</button>
+        </div>
+        
+        <!-- Actual Game -->
+        <div class="frame game-frame">
+            <div class="game-score">
+                <span class="team-color"></span>
+                <div class="game-blueScore card card-inverse card-info text-xs-center">
+                    <div>Team <strong>Blue</strong></div>
+                    <span class="blue-score">0</span>
+                </div>
+                <div class="game-redScore card card-inverse card-danger text-xs-center">
+                    <div>Team <strong>Red</strong></div>
+                    <span class="red-score">0</span>
+                </div>
+            </div>
+            
+            <div class="game-round">
+                <p class="game-category">Category is: <strong>Superheroes</strong></p>
+                <h1 class="game-timer">
+                    1:30
+                </h1>
+                <button class="guessed-correct btn btn-success btn-lg">Team Guessed Correctly!</button>
+            </div>
+            
+            <div class="game-teamList">
+                <div class="game-teamBlue col-xs-12 col-md-5 col-lg-4">
+                    <h3>Team <strong>Blue</strong></h3>
+                    <ul>
+                        <li class="list-group-item list-group-item-info">Michael</li>
+                        <li class="list-group-item list-group-item-info">Paul</li>
+                        <li class="list-group-item list-group-item-info">Gira</li>
+                    </ul>
+                </div>
+                <div class="game-teamRed col-xs-12 col-md-5 col-lg-4">
+                    <h3>Team <strong>Red</strong></h3>
+                    <ul>
+                        <li class="list-group-item list-group-item-danger">Michael</li>
+                        <li class="list-group-item list-group-item-danger">Paul</li>
+                        <li class="list-group-item list-group-item-danger">Gira</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button class="leave-game btn btn-danger-outline">Leave Game!</button>
+        </div>
+        
         <!-- Spinner -->
 		<div class="frame spinner-frame">
 			<h3 class="spinner-category">Click to Spin!</h3>

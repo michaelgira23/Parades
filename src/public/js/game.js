@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-var $frames      = $('.frame');
+var $frames = $('.frame');
 
 /* Menu */
 var $menuFrame   = $('.menu-frame');
@@ -31,18 +31,35 @@ var $createGame  = $('.menu-selections div:first-child');
 var $joinGame    = $('.menu-selections div:last-child');
 
 /* Create Game */
-var $createFrame = $('.createGame-frame');
+var $createGameFrame = $('.createGame-frame');
+var $startGameButton = $('.createGame-frame .createGame-start');
+
+/* Game Code */
+var $gameCodeFrame  = $('.gameCode-frame');
+var $gameCodeReady  = $('.gameCode-frame .gameCode-ready');
+var $gameCodeCancel = $('.gameCode-frame .gameCode-cancel');
+
+/* Join Game */
+var $joinGameFrame  = $('.joinGame-frame');
+var $joinGameButton = $('.joinGame-frame button');
+
+/* Actual Game */
+var $gameFrame = $('.game-frame'); // Your game-frame frame game is lame
+var $leaveGame = $('.game-frame .leave-game'); // Lame
 
 function showMenu() {
     $titleHeader.css('top', '-100vh');
+    $frames.not('.active').css('visibility', 'hidden');
     $frames.removeClass('active');
     
-    $frames.not('.menu-frame').animate({
-        right: '-100vw'
+    $frames.not($menuFrame).animate({
+        right: '-100%'
     }, 600, 'easeOutCubic', function() {
         
+        $frames.css('visibility', 'visible');
+        
         $menuFrame.animate({
-            left: 0
+            right: 0
         }, 600, 'easeOutCubic', function() {
             $menuFrame.addClass('active');
         });
@@ -50,35 +67,86 @@ function showMenu() {
         $titleHeader.animate({
             top: 0
         }, 1500, 'easeOutBounce');
+        
     });
-    
-    $createGame.click(createGame);
-    $joinGame.click(joinGame);
 }
 
-function createGame() {
+function transitionLeft($fromFrame, $toFrame) {
     $frames.removeClass('active');
     
-    $menuFrame.animate({
-        left: '-100vw'
+    $fromFrame.animate({
+        right: '-100%'
     }, 600, 'easeOutCubic', function() {
         
-        $createFrame.animate({
+        $toFrame.animate({
             right: 0
         }, 600, 'easeOutCubic', function() {
-            $createFrame.addClass('active');
+            $toFrame.addClass('active');
         });
     });
-    
 }
 
-function joinGame() {
+function transitionRight($fromFrame, $toFrame) {
+    $frames.removeClass('active');
     
+    $fromFrame.animate({
+        right: '200%'
+    }, 600, 'easeOutCubic', function() {
+        
+        $toFrame.animate({
+            right: 0
+        }, 600, 'easeOutCubic', function() {
+            $toFrame.addClass('active');
+        });
+    });
 }
+
+/* Make the buttons work */
 
 $('.back-to-menu').click(showMenu);
 
-// Actual logic
+// Menu
+
+$createGame.click(function() {
+    transitionRight($menuFrame, $createGameFrame);
+});
+
+$joinGame.click(function() {
+    transitionRight($menuFrame, $joinGameFrame);
+});
+
+// Create Game
+
+$startGameButton.click(function() {
+    // Do some logic to start a game with options
+    transitionRight($createGameFrame, $gameCodeFrame);
+});
+
+// Game Code
+
+$gameCodeReady.click(function() {
+    transitionRight($gameCodeFrame, $gameFrame);
+});
+
+$gameCodeCancel.click(function() {
+    // Do some logic to stop the game
+    transitionLeft($gameCodeFrame, $createGameFrame);
+});
+
+// Join Game
+
+$joinGameButton.click(function() {
+    transitionRight($joinGameFrame, $gameFrame);
+});
+
+// Actual Game
+
+$leaveGame.click(function() {
+    // Do some logic to leave Parades game
+    showMenu();
+});
+
+/* Actually do stuff */
 
 $menuFrame.css('right', 0);
 showMenu();
