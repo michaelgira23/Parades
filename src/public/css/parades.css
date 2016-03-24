@@ -300,6 +300,9 @@ html, body {
     font-weight: 300;
 }
 
+.game-frame .game-round .guessed-correct {
+    z-index: 5;
+}
 
 .game-frame .game-teamList {
     position: relative;
