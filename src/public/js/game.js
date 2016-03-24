@@ -49,55 +49,60 @@ var $leaveGame = $('.game-frame .leave-game'); // Lame
 
 function showMenu() {
     $titleHeader.css('top', '-100vh');
-    $frames.not('.active').css('visibility', 'hidden');
+    // Hide frames in case we have to skip multiple
+    $frames.not('.active').not($menuFrame).css('visibility', 'hidden');
     $frames.removeClass('active');
     
+    // Transition frames to the right
     $frames.not($menuFrame).animate({
         right: '-100%'
     }, 600, 'easeOutCubic', function() {
-        
         $frames.css('visibility', 'visible');
-        
-        $menuFrame.animate({
-            right: 0
-        }, 600, 'easeOutCubic', function() {
-            $menuFrame.addClass('active');
-        });
-        
-        $titleHeader.animate({
-            top: 0
-        }, 1500, 'easeOutBounce');
-        
     });
+    
+    // Show Menu
+    $menuFrame.animate({
+        right: 0
+    }, 600, 'easeOutCubic', function() {
+        $menuFrame.addClass('active');
+    });
+    
+    // Trigger the bounce animation for the menu title
+    $titleHeader.animate({
+        top: 0
+    }, 1500, 'easeOutBounce');
 }
 
 function transitionLeft($fromFrame, $toFrame) {
     $frames.removeClass('active');
     
+    // Transition original frame to the right
     $fromFrame.animate({
         right: '-100%'
+    }, 600, 'easeOutCubic');
+    
+    // Bring next frame from the left
+    $toFrame.animate({
+        right: 0
     }, 600, 'easeOutCubic', function() {
-        
-        $toFrame.animate({
-            right: 0
-        }, 600, 'easeOutCubic', function() {
-            $toFrame.addClass('active');
-        });
+        $toFrame.addClass('active');
     });
 }
 
 function transitionRight($fromFrame, $toFrame) {
     $frames.removeClass('active');
     
+    // Transition original frame to the left
     $fromFrame.animate({
-        right: '200%'
+        right: '100%'
+    }, 600, 'easeOutCubic');
+    
+    
+    // Bring next frame from the right
+    $toFrame.animate({
+        right: 0
     }, 600, 'easeOutCubic', function() {
-        
-        $toFrame.animate({
-            right: 0
-        }, 600, 'easeOutCubic', function() {
-            $toFrame.addClass('active');
-        });
+        $toFrame.addClass('active');
     });
 }
 

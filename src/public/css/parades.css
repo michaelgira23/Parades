@@ -75,21 +75,12 @@ html, body {
     justify-content: center;
     align-items: center;
     
+    animation-name: passiveMove;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    
     cursor: pointer;
-}
-
-.menu-selections div:first-child {
-    animation-name: passiveMove;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-.menu-selections div:last-child {
-    animation-name: passiveMove;
-    animation-duration: 2s;
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
 }
 
 @media(max-width: 360px) {
@@ -184,6 +175,22 @@ html, body {
     margin: 0 auto 2em;
 }
 
+@media(min-width: 768px) {
+    
+    .gameCode-frame .gameCode-teamList .gameCode-teamBlue ul,
+    .gameCode-frame .gameCode-teamList .gameCode-teamRed ul {
+        padding: 0;
+    }
+    
+    .gameCode-frame .gameCode-teamList .gameCode-teamRed {
+        float: right;
+    }
+    
+    .gameCode-frame .gameCode-teamList .gameCode-teamRed h3 {
+        text-align: right;
+    }
+}
+
 /* Join Game */
 
 .joinGame-frame {
@@ -215,6 +222,10 @@ html, body {
 /* Game Frame */
 
 .game-frame .game-score {
+    position: relative;
+    top: 0;
+    align-self: flex-start;
+    
     display: flex;
     padding: 0 calc(50% - 10rem);
     
@@ -224,7 +235,6 @@ html, body {
 .game-frame .game-score .team-color {
     position: absolute;
     z-index: -1;
-    top: 0;
     left: 0;
     right: 0;
     
@@ -259,63 +269,95 @@ html, body {
     border-bottom-left-radius: 0;
 }
 
-.blue-score,
-.red-score {
+.game-frame .game-score .game-blueScore .blue-score,
+.game-frame .game-score .game-redScore .red-score {
     font-size: 2em;
+    font-weight: 300;
+}
+
+.game-frame .game-round {
+    position: relative;
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    
+    font-size: 1.5em;
     font-weight: 300;
 }
 
 .game-frame .game-round .game-category {
     margin: 0;
-    
     text-align: center;
-    font-weight: 300;
 }
 
 .game-frame .game-round .game-timer {
-    text-align: center;
-    font-size: 6em;
+    margin: 0;
+    
+    font-size: 5em;
     font-weight: 300;
 }
 
-.game-frame .game-round .guessed-correct {
-    display: block;
-    margin: 0 auto;
-}
 
-.game-frame .game-teamList,
-.gameCode-frame .gameCode-teamList {
-    display: inline-block;
+.game-frame .game-teamList {
+    position: relative;
     width: 100%;
-    padding: 1em;
 }
 
-.game-frame .leave-game {
-    display: block;
-    margin: 1em auto;
+.game-frame .game-footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+}
+
+.game-frame .game-footer .leave-game {
+    margin-bottom: 1em;
 }
 
 @media(min-width: 768px) {
     
-    .game-frame .game-round {
-        font-size: 1.5em;
-    }
-    
     .game-frame .game-teamList .game-teamBlue ul,
-    .game-frame .game-teamList .game-teamRed ul,
-    .gameCode-frame .gameCode-teamList .gameCode-teamBlue ul,
-    .gameCode-frame .gameCode-teamList .gameCode-teamRed ul {
+    .game-frame .game-teamList .game-teamRed ul {
         padding: 0;
     }
     
-    .game-frame .game-teamList .game-teamRed,
-    .gameCode-frame .gameCode-teamList .gameCode-teamRed{
+    .game-frame .game-teamList .game-teamRed {
         float: right;
     }
     
-    .game-frame .game-teamList .game-teamRed h3,
-    .gameCode-frame .gameCode-teamList .gameCode-teamRed h3 {
+    .game-frame .game-teamList .game-teamRed h3 {
         text-align: right;
+    }
+}
+
+@media(min-width: 992px) {
+    .game-frame .game-score {
+        position: absolute;
+    }
+    
+    .game-frame .game-round {
+        position: absolute;
+        height: 100%;
+    }
+    
+    .game-frame .game-teamList {
+        position: absolute;
+        height: 100%;
+        
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .game-frame .game-footer {
+        position: absolute;
     }
 }
 
