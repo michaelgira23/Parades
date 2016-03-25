@@ -43,27 +43,27 @@ html, body {
     align-items: center;
 }
 
-.menu-title {
+.menu-frame .menu-title {
     margin-bottom: 1em;
 }
 
-.menu-title small {
+.menu-frame .menu-title small {
     position: absolute;
 }
 
-.menu-title h1 {
+.menu-frame .menu-title h1 {
     position: relative;
     top: -100%;
     margin-top: 0.75rem;
     line-height: 0.8em;
 }
 
-.menu-selections {
+.menu-frame .menu-selections {
     display: flex;
     flex-direction: column;
 }
 
-.menu-selections div {
+.menu-frame .menu-selections div {
     height: 8em;
     width: 8em;
     margin: 0 0.5em;
@@ -81,6 +81,10 @@ html, body {
     animation-direction: alternate;
     
     cursor: pointer;
+}
+
+.menu-frame div.input-group {
+    margin: 0 1em;
 }
 
 @media(max-width: 360px) {
@@ -103,11 +107,11 @@ html, body {
 
 @media(min-width: 361px) {
     
-    .menu-selections {
+    .menu-frame .menu-selections {
         flex-direction: row;
     }
 
-    .menu-selections div:last-child {
+    .menu-frame .menu-selections div:last-child {
         animation-delay: 0.5s;
     }
 }

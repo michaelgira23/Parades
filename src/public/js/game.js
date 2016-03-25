@@ -22,17 +22,25 @@
  * SOFTWARE.
  */
 
+var username = 'Anonymous';
+
+var socket  = io();
 var $frames = $('.frame');
 
 /* Menu */
-var $menuFrame   = $('.menu-frame');
-var $titleHeader = $('.menu-title h1');
-var $createGame  = $('.menu-selections div:first-child');
-var $joinGame    = $('.menu-selections div:last-child');
+var $menuFrame      = $('.menu-frame');
+var $titleHeader    = $('.menu-frame .menu-title h1');
+var $menuSelections = $('.menu-frame .menu-selections');
+var $createGame     = $('.menu-frame .menu-selections div:first-child');
+var $joinGame       = $('.menu-frame .menu-selections div:last-child');
+var $usernameForm   = $('.menu-frame .inputUsername');
+var $usernameInput  = $('.menu-frame .inputUsername .username');
+var $usernameButton = $('.menu-frame .inputUsername button');
 
 /* Create Game */
 var $createGameFrame = $('.createGame-frame');
 var $startGameButton = $('.createGame-frame .createGame-start');
+var $roundTime       = $('.createGame-frame .createGame-options .roundTime');
 
 /* Game Code */
 var $gameCodeFrame  = $('.gameCode-frame');
@@ -112,6 +120,17 @@ $('.back-to-menu').click(showMenu);
 
 // Menu
 
+$usernameInput.keyup(function(event) {
+    $usernameButton.prop('disabled', this.value === '');
+});
+
+$usernameForm.submit(function(event) {
+    event.preventDefault();
+    username = $usernameInput.val();
+    $usernameForm.fadeOut();
+    $menuSelections.delay(400).fadeIn();
+});
+
 $createGame.click(function() {
     transitionRight($menuFrame, $createGameFrame);
 });
@@ -123,7 +142,11 @@ $joinGame.click(function() {
 // Create Game
 
 $startGameButton.click(function() {
-    // Do some logic to start a game with options
+    var roundTime = parseInt($roundTime.val(), 10);
+    socket.emit('create game', 'Username', {
+        roundTime: roundTime
+    });
+    
     transitionRight($createGameFrame, $gameCodeFrame);
 });
 
@@ -154,4 +177,11 @@ $leaveGame.click(function() {
 /* Actually do stuff */
 
 $menuFrame.css('right', 0);
+$menuSelections.hide();
+$usernameButton.prop('disabled', true);
 showMenu();
+
+socket.on('debug', function(data) {
+    console.log('debug');
+    console.log(data);
+});
