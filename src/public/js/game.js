@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-var username = 'Anonymous';
-
 var socket  = io();
 var $frames = $('.frame');
 
@@ -44,12 +42,17 @@ var $roundTime       = $('.createGame-frame .createGame-options .roundTime');
 
 /* Game Code */
 var $gameCodeFrame  = $('.gameCode-frame');
+var $gameCode       = $('.gameCode-frame .gameCode-code');
 var $gameCodeReady  = $('.gameCode-frame .gameCode-ready');
 var $gameCodeCancel = $('.gameCode-frame .gameCode-cancel');
 
 /* Join Game */
 var $joinGameFrame  = $('.joinGame-frame');
-var $joinGameButton = $('.joinGame-frame button');
+var $joinGameBack   = $('.joinGame-frame .back-header .back-to-menu');
+var $joinGameError  = $('.joinGame-frame .back-header .wrong-gameCode');
+var $joinGameForm   = $('.joinGame-frame .joinGame-submitCode');
+var $joinGameCode   = $('.joinGame-frame .joinGame-submitCode input')
+var $joinGameButton = $('.joinGame-frame .joinGame-submitCode button');
 
 /* Actual Game */
 var $gameFrame = $('.game-frame'); // Your game-frame frame game is lame
@@ -120,13 +123,15 @@ $('.back-to-menu').click(showMenu);
 
 // Menu
 
-$usernameInput.keyup(function(event) {
+// Disable button when input is empty
+$usernameInput.bind('keydown keyup', function(event) {
     $usernameButton.prop('disabled', this.value === '');
 });
 
+// Emit username when the form is submitted
 $usernameForm.submit(function(event) {
     event.preventDefault();
-    username = $usernameInput.val();
+    socket.emit('username', $usernameInput.val());
     $usernameForm.fadeOut();
     $menuSelections.delay(400).fadeIn();
 });
@@ -143,11 +148,14 @@ $joinGame.click(function() {
 
 $startGameButton.click(function() {
     var roundTime = parseInt($roundTime.val(), 10);
-    socket.emit('create game', 'Username', {
+    socket.emit('create game', {
         roundTime: roundTime
     });
     
-    transitionRight($createGameFrame, $gameCodeFrame);
+    socket.on('game id', function(id) {
+        $gameCode.text(id);
+        transitionRight($createGameFrame, $gameCodeFrame);
+    });
 });
 
 // Game Code
@@ -157,20 +165,39 @@ $gameCodeReady.click(function() {
 });
 
 $gameCodeCancel.click(function() {
-    // Do some logic to stop the game
+    socket.emit('leave game');
     transitionLeft($gameCodeFrame, $createGameFrame);
 });
 
 // Join Game
 
-$joinGameButton.click(function() {
-    transitionRight($joinGameFrame, $gameFrame);
+// Disable button when input is empty
+$joinGameCode.bind('keydown keyup', function(event) {
+    $joinGameButton.prop('disabled', this.value === '');
+});
+
+// Emit 'join game' when the form is submitted
+$joinGameForm.submit(function(event) {
+    event.preventDefault();
+    socket.emit('join game', $joinGameCode.val());
+    socket.on('join game response', function(success) {
+        if(success) {
+            $joinGameError.fadeOut();
+            transitionRight($joinGameFrame, $gameFrame);
+        } else {
+            $joinGameError.fadeIn();
+        }
+    });
+});
+
+$joinGameBack.click(function() {
+    $joinGameError.fadeOut();
 });
 
 // Actual Game
 
 $leaveGame.click(function() {
-    // Do some logic to leave Parades game
+    socket.emit('leave game');
     showMenu();
 });
 
@@ -178,7 +205,9 @@ $leaveGame.click(function() {
 
 $menuFrame.css('right', 0);
 $menuSelections.hide();
-$usernameButton.prop('disabled', true);
+$usernameButton.prop('disabled', $usernameInput.val() === '');
+$joinGameButton.prop('disabled', $joinGameCode.val() === '');
+$joinGameError.hide();
 showMenu();
 
 socket.on('debug', function(data) {

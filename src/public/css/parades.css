@@ -214,12 +214,16 @@ html, body {
     text-align: center;
 }
 
-.joinGame-frame input {
+.joinGame-frame .joinGame-submitCode {
+    text-align: center;
+}
+
+.joinGame-frame .joinGame-submitCode input {
     text-align: center;
     width: 10rem;
 }
 
-.joinGame-frame button {
+.joinGame-frame .joinGame-submitCode button {
     margin-top: 1em;
 }
 
@@ -261,6 +265,7 @@ html, body {
 .game-frame .game-score .game-blueScore,
 .game-frame .game-score .game-redScore {
     width: 10rem;
+    margin: 0;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
@@ -279,9 +284,14 @@ html, body {
     font-weight: 300;
 }
 
+.game-frame .game-score .game-gameCode {
+    display: inline-block;
+}
+
 .game-frame .game-round {
     position: relative;
     width: 100%;
+    margin: 2.5em 0;
     
     display: flex;
     justify-content: center;
@@ -313,6 +323,11 @@ html, body {
     width: 100%;
 }
 
+.game-frame .game-teamList .game-teamBlue,
+.game-frame .game-teamList .game-teamRed {
+    text-align: left;
+}
+
 .game-frame .game-footer {
     position: relative;
     bottom: 0;
@@ -337,6 +352,7 @@ html, body {
     
     .game-frame .game-teamList .game-teamRed {
         float: right;
+        text-align: right;
     }
     
     .game-frame .game-teamList .game-teamRed h3 {
@@ -352,6 +368,7 @@ html, body {
     .game-frame .game-round {
         position: absolute;
         height: 100%;
+        margin: 0;
     }
     
     .game-frame .game-teamList {
