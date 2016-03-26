@@ -79,7 +79,7 @@ function showMenu() {
     });
     
     // Trigger the bounce animation for the menu title
-    $titleHeader.animate({
+    $titleHeader.delay(100).animate({
         top: 0
     }, 1500, 'easeOutBounce');
 }
