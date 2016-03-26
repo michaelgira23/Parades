@@ -229,18 +229,16 @@ html, body {
 
 /* Game Frame */
 
-.game-frame .game-score {
+.game-frame .game-header {
     position: relative;
+    width: 100%;
     top: 0;
     align-self: flex-start;
-    
-    display: flex;
-    padding: 0 calc(50% - 10rem);
     
     text-align: center;
 }
 
-.game-frame .game-score .team-color {
+.game-frame .game-header .team-color {
     position: absolute;
     z-index: -1;
     left: 0;
@@ -254,38 +252,54 @@ html, body {
     background-color: #ccc;
 }
 
-.game-frame .game-score .team-color.blue {
+.game-frame .game-header .game-score {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.game-frame .game-header .game-score .team-color.blue {
     background-color: #0275d8;
 }
 
-.game-frame .game-score .team-color.red {
+.game-frame .game-header .game-score .team-color.red {
     background-color: #c9302b;
 }
 
-.game-frame .game-score .game-blueScore,
-.game-frame .game-score .game-redScore {
+.game-frame .game-header .game-score .game-blueScore,
+.game-frame .game-header .game-score .game-redScore {
     width: 10rem;
     margin: 0;
+    
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
 
-.game-frame .game-score .game-blueScore {
+.game-frame .game-header .game-score .game-blueScore {
     border-bottom-right-radius: 0;
 }
 
-.game-frame .game-score .game-redScore {
+.game-frame .game-header .game-score .game-redScore {
     border-bottom-left-radius: 0;
 }
 
-.game-frame .game-score .game-blueScore .blue-score,
-.game-frame .game-score .game-redScore .red-score {
+.game-frame .game-header .game-score .game-blueScore .blue-score,
+.game-frame .game-header .game-score .game-redScore .red-score {
     font-size: 2em;
     font-weight: 300;
 }
 
-.game-frame .game-score .game-gameCode {
+.game-frame .game-header .game-gameCode {
     display: inline-block;
+    margin: 0 auto;
+    padding: 0.25em 0.5em;
+    
+    font-size: 1.25em;
+    font-weight: 300;
+    
+    border-top: none;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
 
 .game-frame .game-round {
@@ -326,6 +340,8 @@ html, body {
 .game-frame .game-teamList .game-teamBlue,
 .game-frame .game-teamList .game-teamRed {
     text-align: left;
+    max-height: 80%;
+    overflow-y: scroll;
 }
 
 .game-frame .game-footer {
@@ -340,6 +356,7 @@ html, body {
 }
 
 .game-frame .game-footer .leave-game {
+    margin-top: 2em;
     margin-bottom: 1em;
 }
 
@@ -361,7 +378,8 @@ html, body {
 }
 
 @media(min-width: 992px) {
-    .game-frame .game-score {
+    
+    .game-frame .game-header {
         position: absolute;
     }
     

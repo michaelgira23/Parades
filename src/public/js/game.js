@@ -55,8 +55,10 @@ var $joinGameCode   = $('.joinGame-frame .joinGame-submitCode input')
 var $joinGameButton = $('.joinGame-frame .joinGame-submitCode button');
 
 /* Actual Game */
-var $gameFrame = $('.game-frame'); // Your game-frame frame game is lame
-var $leaveGame = $('.game-frame .leave-game'); // Lame
+var $gameFrame      = $('.game-frame');
+var $gameCodeCard   = $('.game-frame .game-header .game-gameCode');
+var $guessedCorrect = $('.game-frame .game-round .guessed-correct');
+var $leaveGame      = $('.game-frame .leave-game');
 
 function showMenu() {
     $titleHeader.css('top', '-100vh');
@@ -161,6 +163,8 @@ $startGameButton.click(function() {
 // Game Code
 
 $gameCodeReady.click(function() {
+    $gameCodeCard.show();
+    $guessedCorrect.show();
     transitionRight($gameCodeFrame, $gameFrame);
 });
 
@@ -199,6 +203,8 @@ $joinGameBack.click(function() {
 $leaveGame.click(function() {
     socket.emit('leave game');
     showMenu();
+    $gameCodeCard.hide();
+    $guessedCorrect.hide();
 });
 
 /* Actually do stuff */
@@ -206,8 +212,13 @@ $leaveGame.click(function() {
 $menuFrame.css('right', 0);
 $menuSelections.hide();
 $usernameButton.prop('disabled', $usernameInput.val() === '');
+
 $joinGameButton.prop('disabled', $joinGameCode.val() === '');
 $joinGameError.hide();
+
+$gameCodeCard.hide();
+$guessedCorrect.hide();
+
 showMenu();
 
 socket.on('debug', function(data) {
