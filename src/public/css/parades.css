@@ -179,7 +179,17 @@ html, body {
     margin: 0 auto 2em;
 }
 
+.gameCode-frame .gameCode-teamList .gameCode-teamBlue,
+.gameCode-frame .gameCode-teamList .gameCode-teamRed {
+    margin-bottom: 2em;
+}
+
 @media(min-width: 768px) {
+    
+    .gameCode-frame .gameCode-teamList .gameCode-teamBlue,
+    .gameCode-frame .gameCode-teamList .gameCode-teamRed {
+        margin: 0;
+    }
     
     .gameCode-frame .gameCode-teamList .gameCode-teamBlue ul,
     .gameCode-frame .gameCode-teamList .gameCode-teamRed ul {
@@ -229,6 +239,25 @@ html, body {
 
 /* Game Frame */
 
+.game-frame .game-startOverlay {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+.game-frame .game-startOverlay .game-startingNumbers {
+    color: white;
+    font-size: 50vw;
+    font-weight: 300;
+}
+
 .game-frame .game-header {
     position: relative;
     width: 100%;
@@ -258,11 +287,11 @@ html, body {
     justify-content: center;
 }
 
-.game-frame .game-header .game-score .team-color.blue {
+.game-frame .game-header .team-color.blue {
     background-color: #0275d8;
 }
 
-.game-frame .game-header .game-score .team-color.red {
+.game-frame .game-header .team-color.red {
     background-color: #c9302b;
 }
 
@@ -344,6 +373,11 @@ html, body {
     overflow-y: scroll;
 }
 
+.game-frame .game-teamList .game-teamBlue ul,
+.game-frame .game-teamList .game-teamRed ul {
+    margin-bottom: 2em;
+}
+
 .game-frame .game-footer {
     position: relative;
     bottom: 0;
@@ -396,6 +430,11 @@ html, body {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+    
+    .game-frame .game-teamList .game-teamBlue ul,
+    .game-frame .game-teamList .game-teamRed ul {
+        margin: 0;
     }
     
     .game-frame .game-footer {

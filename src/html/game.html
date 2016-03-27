@@ -83,19 +83,11 @@
             <div class="gameCode-teamList">
                 <div class="gameCode-teamBlue col-xs-12 col-md-5 col-lg-4">
                     <h3>Team <strong>Blue</strong></h3>
-                    <ul>
-                        <li class="list-group-item list-group-item-info">Michael</li>
-                        <li class="list-group-item list-group-item-info">Paul</li>
-                        <li class="list-group-item list-group-item-info">Gira</li>
-                    </ul>
+                    <ul class="team-blue list-group"></ul>
                 </div>
                 <div class="gameCode-teamRed col-xs-12 col-md-5 col-lg-4">
                     <h3>Team <strong>Red</strong></h3>
-                    <ul>
-                        <li class="list-group-item list-group-item-danger">Michael</li>
-                        <li class="list-group-item list-group-item-danger">Paul</li>
-                        <li class="list-group-item list-group-item-danger">Gira</li>
-                    </ul>
+                    <ul class="team-red list-group"></ul>
                 </div>
             </div>
         </div>
@@ -114,13 +106,16 @@
             
             <h1 class="display-4">Gamecode</h1>
             <form class="joinGame-submitCode">
-                <input class="gamecode form-control form-control-lg" autocomplete="off">
+                <input class="gamecode form-control form-control-lg" type="tel" autocomplete="off">
                 <button class="btn btn-primary">Let's Go!</button>
             </form>
         </div>
         
         <!-- Actual Game -->
         <div class="frame game-frame">
+            <div class="game-startOverlay">
+                <div class="game-startingNumbers">3</div>
+            </div>
             <div class="game-header">
                 <span class="team-color"></span>
                 <div class="game-score">
@@ -140,27 +135,17 @@
             </div>
             <div class="game-round">
                 <p class="game-category">Category is: <strong>Superheroes</strong></p>
-                <h1 class="game-timer">
-                    1:30
-                </h1>
+                <h1 class="game-timer">0:00</h1>
                 <button class="guessed-correct btn btn-success btn-lg">Team Guessed Correctly!</button>
             </div>
             <div class="game-teamList">
                 <div class="game-teamBlue col-xs-12 col-md-5 col-lg-4">
                     <h3>Team <strong>Blue</strong></h3>
-                    <ul>
-                        <li class="list-group-item list-group-item-info">Michael</li>
-                        <li class="list-group-item list-group-item-info">Paul</li>
-                        <li class="list-group-item list-group-item-info">Gira</li>
-                    </ul>
+                    <ul class="team-blue list-group"></ul>
                 </div>
                 <div class="game-teamRed col-xs-12 col-md-5 col-lg-4">
                     <h3>Team <strong>Red</strong></h3>
-                    <ul>
-                        <li class="list-group-item list-group-item-danger">Michael</li>
-                        <li class="list-group-item list-group-item-danger">Paul</li>
-                        <li class="list-group-item list-group-item-danger">Gira</li>
-                    </ul>
+                    <ul class="team-red list-group"></ul>
                 </div>
             </div>
             <div class="game-footer">

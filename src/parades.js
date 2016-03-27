@@ -32,61 +32,68 @@ var gameCodeLength = 4;
 module.exports = function(io) {
     
     io.on('connection', function(socket) {
-        console.log(games);
         socket.on('username', function(username) {
             
             socket.on('create game', function(options) {
                 if(!playerInGame(socket.id)) {
                     
-                    var gameId = initializeGame(socket.id, username, options);
+                    var gameId = initializeGame(io, socket.id, username, options);
                     socket.emit('game id', gameId);
                     
-                    console.log(games[gameId].players);
-                    
                     socket.on('start game', function() {
-                        games[gameId].start();
-                        console.log(games[gameId].players);
+                        if(gameExists(gameId)) {
+                            games[gameId].start();
+                        }
                     });
 
                     socket.on('leave game', function() {
-                        games[gameId].end();
-                        console.log(games[gameId].players);
+                        if(gameExists(gameId)) {
+                            games[gameId].end();
+                        }
                     });
                     
                     // Also stop game if leader disconnects
                     socket.on('disconnect', function() {
-                        games[gameId].end();
-                        console.log(games[gameId].players);
+                        if(gameExists(gameId)) {
+                            games[gameId].end();
+                        }
                     });
                 }
             });
             
             socket.on('join game', function(gameId) {
-                if(!playerInGame(socket.id) && typeof games[gameId] !== 'undefined') {
+                if(!playerInGame(socket.id) && gameExists(gameId)) {
                     
                     games[gameId].playerJoin(socket, username);
-                    socket.emit('join game response', true);
-                    console.log(games[gameId].players);
+                    // Send player data and game data
+                    socket.emit('join game response', true, games[gameId].players[socket.id], games[gameId].getStatus());
                     
                     socket.on('leave game', function() {
-                        games[gameId].playerLeave(socket.id);
-                    })
+                        if(gameExists(gameId)) {
+                            games[gameId].playerLeave(socket.id);
+                        }
+                    });
                     
                     // Leave if player disconnects
                     socket.on('disconnect', function() {
-                        games[gameId].playerLeave(socket.id);
-                        console.log(games[gameId].players);
+                        if(gameExists(gameId)) {
+                            games[gameId].playerLeave(socket.id);
+                        }
                     });
                 } else {
-                    socket.emit('join game response', false);
+                    socket.emit('join game response', false, null, null);
                 }
             });
         });
     });
 }
 
-/* Returns a random 5 digit number */
+/* Determine if a game already exists */
+function gameExists(id) {
+    return typeof games[id] !== 'undefined';
+}
 
+/* Returns a random 5 digit number */
 function generateGameId() {
     var gameId = '';
     for(var i = 0; i < gameCodeLength; i++) {
@@ -96,9 +103,9 @@ function generateGameId() {
 }
 
 /* Initializes game */
-function initializeGame(socketId, username, options) {
+function initializeGame(io, socketId, username, options) {
     console.log('Initialize Game');
-    var newGame = new Game(socketId, username, options);
+    var newGame = new Game(io, socketId, username, options);
     var id = newGame.gameId;
     games[id] = newGame;
     return id;
@@ -117,12 +124,13 @@ function playerInGame(socketId) {
 
 /* Game "class" */
 
-function Game(socketId, username, options) {
+function Game(io, socketId, username, options) {
     console.log('Create game instance');
+    this.io = io;
     
     // Game ID
     this.gameId = generateGameId();
-    while(typeof games[this.gameId] !== 'undefined') {
+    while(gameExists(this.gameId)) {
         this.gameId = generateGameId();
     }
     
@@ -149,16 +157,14 @@ function Game(socketId, username, options) {
     this.blueScore = 0;
     this.redScore  = 0;
     
-    this.started   = false;
+    this.category    = 'Unknown';
+    this.currentTime = this.options.roundTime;
+    this.started     = false;
+    
+    this.emitStatus();
 }
 
-// Emits something to everyone in the game
-Game.prototype.emit = function(event, data) {
-    _.each(this.players, function(value, key) {
-        io.to(key).emit(event, data);
-    });
-}
-
+// Returns a JSON containing stats about the current round
 Game.prototype.getStatus = function() {
     var response = {};
     
@@ -166,12 +172,40 @@ Game.prototype.getStatus = function() {
     response.score.blue = this.blueScore;
     response.score.red  = this.redScore;
     
-    response.options = this.options;
+    response.round = {};
+    // Dummy values, implement later
+    response.round.category = this.category;
+    response.round.currentTime = this.currentTime;
     
-    response.teams = {};
-    response.teams.spectator = this.getTeam('spectator');
-    response.teams.blue = this.getTeam('blue');
-    response.teams.red  = this.getTeam('red');
+    return response;
+}
+
+// Emits something to everyone in the game
+Game.prototype.emit = function(event, data) {
+    var io = this.io;
+    _.each(this.players, function(value, key) {
+        io.to(key).emit(event, data);
+    });
+}
+
+// Emits an array of players to everyone in the game
+Game.prototype.emitPlayers = function() {
+    var playersList  = {};
+    
+    playersList.blue = [];
+    playersList.red  = [];
+    playersList.spectator = [];
+    
+    _.each(this.players, function(value, key) {
+        playersList[value.team].push(value.username);
+    });
+    
+    this.emit('player list', playersList);
+}
+
+// Emits game status to all players in the game
+Game.prototype.emitStatus = function() {
+    this.emit('game status', this.getStatus());
 }
 
 // Returns a list of usernames for a certain team
@@ -189,41 +223,41 @@ Game.prototype.getTeam = function(team) {
 Game.prototype.start = function() {
     console.log('Start game');
     if(!this.start) {
-        // Start game
-        console.log('I would start the game');
+        // Start game since it isn't already started
+        this.start = true;
+        this.emitStatus();
+//        this.emit('start timer animation');
     }
 }
 
 // Stops the game
 Game.prototype.end = function() {
     console.log('End game');
-    // Stop game
-    console.log('I would stop the game');
+    delete games[this.gameId];
 }
 
 // Makes a player join a game
 Game.prototype.playerJoin = function(socket, username) {
     console.log('Player ' + username + ' joined');
     
-    var socketId = socket.id;
-    
     // Determine which team new guy should go on
     var blueCount = this.getTeam('blue').length;
     var redCount  = this.getTeam('red').length;
     
-    if(blueCount < redCount) {
-        var team = 'blue';
-    } else {
+    if(blueCount > redCount) {
         var team = 'red';
+    } else {
+        var team = 'blue';
     }
-    socket.emit('team', team);
     
-    this.players[socketId] =
+    this.players[socket.id] =
     {
         username  : username,
         team      : team,
         permission: 0,
     };
+    
+    this.emitPlayers();
 }
 
 // Checks if a player's socket id is currently in the game
@@ -242,4 +276,5 @@ Game.prototype.playerChangeTeam = function(socketId, team) {
 Game.prototype.playerLeave = function(socketId) {
     console.log('Player ' + this.players[socketId].username + ' left');
     delete this.players[socketId];
+    this.emitPlayers();
 }
