@@ -139,7 +139,6 @@ function updateGameStatus(gameStatus) {
     $gameRedScore.text(gameStatus.score.red);
     
     // Update current round
-    console.log(gameStatus.round.category);
     $gameCategory.text(gameStatus.round.category);
     timer = gameStatus.round.currentTime;
     updateTimer(timer);
@@ -165,7 +164,6 @@ function updatePlayerStatus(playerData) {
 }
 
 function updateTimer(seconds) {
-    console.log(seconds);
     if(seconds < 0) {
         seconds = 0;
     }
@@ -176,27 +174,50 @@ function updateTimer(seconds) {
     // Add leading zero
     var secondString = secondValue.toString();
     if(secondString.length < 2) {
-        secondString += '0';
+        secondString = '0' + secondString;
     }
     
     $gameTimer.text(minuteValue + ':' + secondString);
 }
 
+// Will count down the number of seconds on the timer
+function countDownTimer(seconds) {
+    updateTimer(seconds);
+    setInterval(function() {
+        if(--seconds >= 0) {
+            updateTimer(seconds);
+        }
+    }, 1000);
+}
+
+// Animation that count down. Takes 5 seconds.
 function startingAnimation() {
-    $gameOverlay.fadeIn();
-    $gameStartNumbers.delay(1000).show().text('3');
-    $gameStartNumbers.delay(2000).text('2');
-    $gameStartNumbers.delay(3000).text('1');
-    $gameStartNumbers.delay(4000).text('GO!');
-    $gameOverlay.delay(5000).fadeOut();
-    $gameStartNumbers.delay(6000).hide();
+    $gameOverlay.fadeIn('500');
+    setTimeout(function() {
+        $gameStartNumbers.text('3').show();
+        setTimeout(function() {
+            $gameStartNumbers.text('2');
+            setTimeout(function() {
+                $gameStartNumbers.text('1');
+                setTimeout(function() {
+                    $gameStartNumbers.text('GO!');
+                    setTimeout(function() {
+                        $gameOverlay.fadeOut('500');
+                        setTimeout(function() {
+                            $gameStartNumbers.hide();
+                        }, 500);
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        }, 1000);
+    }, 500);
 }
 
 /* Make the buttons work */
 
 $('.back-to-menu').click(showMenu);
 
-// Menu
+/* Menu */
 
 // Disable button when input is empty
 $usernameInput.bind('keydown keyup', function(event) {
@@ -219,7 +240,7 @@ $joinGame.click(function() {
     transitionRight($menuFrame, $joinGameFrame);
 });
 
-// Create Game
+/* Create Game */
 
 $startGameButton.click(function() {
     var roundTime = parseInt($roundTime.val(), 10);
@@ -234,12 +255,16 @@ $startGameButton.click(function() {
     });
 });
 
-// Game Code
+/* Game Code */
 
 $gameCodeReady.click(function() {
     $gameCodeCard.show();
     $guessedCorrect.show();
     transitionRight($gameCodeFrame, $gameFrame);
+    
+    setTimeout(function() {
+        socket.emit('start game');
+    }, 800);
 });
 
 $gameCodeCancel.click(function() {
@@ -247,7 +272,7 @@ $gameCodeCancel.click(function() {
     transitionLeft($gameCodeFrame, $createGameFrame);
 });
 
-// Join Game
+/* Join Game */
 
 // Disable button when input is empty
 $joinGameCode.bind('keydown keyup', function(event) {
@@ -278,7 +303,7 @@ $joinGameBack.click(function() {
     $joinGameError.fadeOut();
 });
 
-// Actual Game
+/* Actual Game */
 
 $leaveGame.click(function() {
     socket.emit('leave game');
@@ -287,8 +312,17 @@ $leaveGame.click(function() {
     $guessedCorrect.hide();
 });
 
+// Update values
 socket.on('game status', updateGameStatus);
 socket.on('player list', updatePlayerList);
+
+// Game components
+socket.on('start animation', startingAnimation);
+socket.on('count down', countDownTimer);
+
+socket.on('count down', function(seconds) {
+    console.log('Count down from' + seconds + ' seconds');
+});
 
 /* Actually do stuff */
 

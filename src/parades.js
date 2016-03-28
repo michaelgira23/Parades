@@ -42,20 +42,20 @@ module.exports = function(io) {
                     
                     socket.on('start game', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].start();
+                            games[gameId].startGame();
                         }
                     });
 
                     socket.on('leave game', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].end();
+                            games[gameId].endGame();
                         }
                     });
                     
                     // Also stop game if leader disconnects
                     socket.on('disconnect', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].end();
+                            games[gameId].endGame();
                         }
                     });
                 }
@@ -158,8 +158,9 @@ function Game(io, socketId, username, options) {
     this.redScore  = 0;
     
     this.category    = 'Unknown';
+    this.guessing    = 'Unknown';
     this.currentTime = this.options.roundTime;
-    this.started     = false;
+    this.gameStarted = false;
     
     this.emitStatus();
 }
@@ -220,18 +221,38 @@ Game.prototype.getTeam = function(team) {
 }
 
 // Starts the game when everyone is ready
-Game.prototype.start = function() {
-    console.log('Start game');
-    if(!this.start) {
-        // Start game since it isn't already started
-        this.start = true;
-        this.emitStatus();
-//        this.emit('start timer animation');
+Game.prototype.startGame = function() {
+    if(!this.gameStarted) {
+        this.startRound();
     }
 }
 
+// Starts a new round
+Game.prototype.startRound = function() {
+    
+    // this.emit is out of scope in setTimeout function
+    var that = this;
+
+    console.log('Start game');
+    // Start game since it isn't already started
+    this.gameStarted = true;
+    this.emitStatus();
+    this.emit('start animation');
+
+    // Starting animation takes 5 seconds
+    var startTime = this.options.roundTime;
+
+    setTimeout(function() {
+        that.emit('count down', startTime);
+
+        setTimeout(function() {
+            // Round is over
+        }, startTime * 1000);
+    }, 5000);
+}
+
 // Stops the game
-Game.prototype.end = function() {
+Game.prototype.endGame = function() {
     console.log('End game');
     delete games[this.gameId];
 }
