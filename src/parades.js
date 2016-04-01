@@ -26,6 +26,8 @@ var Random = require("random-js");
 var random = new Random(Random.engines.mt19937().autoSeed());
 var _      = require('underscore');
 
+var categories = require(__dirname + '/categories.js');
+
 var games  = module.exports.games = {};
 var gameCodeLength = 4;
 
@@ -238,10 +240,14 @@ Game.prototype.startGame = function() {
     }
 }
 
+Game.prototype.chooseCategory = function() {
+    if(this.round.category === 'Unknown') {
+        this.round.category = getRandomCategory;
+    }
+}
+
 // Starts a new round
 Game.prototype.startRound = function() {
-    this.inRound = true;
-    
     // this.emit is out of scope in setTimeout function
     var that = this;
 
