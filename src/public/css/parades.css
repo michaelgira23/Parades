@@ -31,7 +31,7 @@ html, body {
     position: fixed;
     right: -100%;
     
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 /* Menu */
@@ -370,7 +370,7 @@ html, body {
 .game-frame .game-teamList .game-teamRed {
     text-align: left;
     max-height: 80%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .game-frame .game-teamList .game-teamBlue ul,

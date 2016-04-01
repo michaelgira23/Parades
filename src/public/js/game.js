@@ -183,7 +183,12 @@ function updateTimer(seconds) {
 // Will count down the number of seconds on the timer
 function countDownTimer(seconds) {
     updateTimer(seconds);
-    setInterval(function() {
+    var timer = setInterval(function() {
+        
+        // Stop timer if person left the game
+        if(!$gameFrame.hasClass('active')) {
+            clearInterval(timer);
+        }
         if(--seconds >= 0) {
             updateTimer(seconds);
         }
@@ -305,6 +310,10 @@ $joinGameBack.click(function() {
 
 /* Actual Game */
 
+$guessedCorrect.click(function() {
+    socket.emit('guessed correct');
+});
+
 $leaveGame.click(function() {
     socket.emit('leave game');
     showMenu();
@@ -319,10 +328,6 @@ socket.on('player list', updatePlayerList);
 // Game components
 socket.on('start animation', startingAnimation);
 socket.on('count down', countDownTimer);
-
-socket.on('count down', function(seconds) {
-    console.log('Count down from' + seconds + ' seconds');
-});
 
 /* Actually do stuff */
 

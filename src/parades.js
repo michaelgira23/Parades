@@ -45,6 +45,12 @@ module.exports = function(io) {
                             games[gameId].startGame();
                         }
                     });
+                    
+                    socket.on('guessed correct', function() {
+                        if(gameExists(gameId)) {
+                            
+                        }
+                    });
 
                     socket.on('leave game', function() {
                         if(gameExists(gameId)) {
@@ -157,12 +163,17 @@ function Game(io, socketId, username, options) {
     this.blueScore = 0;
     this.redScore  = 0;
     
-    this.category    = 'Unknown';
-    this.guessing    = 'Unknown';
-    this.currentTime = this.options.roundTime;
+    this.round = {};
+    this.round.team  = 'Blue';
+    this.round.category    = 'Unknown';
+    this.round.guessing    = 'Unknown';
+    this.round.currentTime = this.options.roundTime;
+    
     this.gameStarted = false;
+    this.inRound     = false;
     
     this.emitStatus();
+    this.emitPlayers();
 }
 
 // Returns a JSON containing stats about the current round
@@ -175,8 +186,8 @@ Game.prototype.getStatus = function() {
     
     response.round = {};
     // Dummy values, implement later
-    response.round.category = this.category;
-    response.round.currentTime = this.currentTime;
+    response.round.category = this.round.category;
+    response.round.currentTime = this.round.currentTime;
     
     return response;
 }
@@ -229,6 +240,7 @@ Game.prototype.startGame = function() {
 
 // Starts a new round
 Game.prototype.startRound = function() {
+    this.inRound = true;
     
     // this.emit is out of scope in setTimeout function
     var that = this;
@@ -245,15 +257,44 @@ Game.prototype.startRound = function() {
     setTimeout(function() {
         that.emit('count down', startTime);
 
-        setTimeout(function() {
-            // Round is over
-        }, startTime * 1000);
+        that.timer = setInterval(function() {
+            if(--that.roundTime <= 0) {
+                // Round is over
+                that.endRound();
+            }
+        }, 1000);
     }, 5000);
+    this.inRound = false;
+}
+
+Game.prototype.endRound = function() {
+    if(this.inRound && typeof this.timer !== 'undefined') {
+        clearInterval(this.timer);
+        
+        var timeLeft = this.options.roundTime - this.round.currentTime;
+        
+        if(timeLeft <= 0) {
+            // Team lost
+            
+            // Determine which team can "steal" the round
+            if(this.round.team === 'blue') {
+                var stealTeam = 'red';
+            } else {
+                var stealTeam = 'blue';
+            }
+            
+            this.emit('team steal', stealTeam);
+        } else {
+            // Team won
+            this.emit('team won', this.round.team);
+        }
+    }
 }
 
 // Stops the game
 Game.prototype.endGame = function() {
     console.log('End game');
+    this.emit('end game');
     delete games[this.gameId];
 }
 
