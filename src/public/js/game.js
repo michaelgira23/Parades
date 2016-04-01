@@ -23,7 +23,8 @@
  */
 
 var socket = io();
-var timer  = 0; // Time on timer in seconds
+var timer  = 0; // Default time on timer in seconds
+var leader = false;
 
 var $frames = $('.frame');
 
@@ -57,18 +58,18 @@ var $joinGameCode   = $('.joinGame-frame .joinGame-submitCode input')
 var $joinGameButton = $('.joinGame-frame .joinGame-submitCode button');
 
 /* Actual Game */
-var $gameFrame        = $('.game-frame');
-var $gameOverlay      = $('.game-frame .game-startOverlay');
-var $gameStartNumbers = $('.game-frame .game-startOverlay .game-startingNumbers');
-var $gameTeamColor    = $('.game-frame .game-header .team-color');
-var $gameBlueScore    = $('.game-frame .game-header .game-score .game-blueScore .blue-score');
-var $gameRedScore     = $('.game-frame .game-header .game-score .game-redScore .red-score');
-var $gameCodeCard     = $('.game-frame .game-header .game-gameCode');
-var $gameGameCode     = $('.game-frame .game-header .game-gameCode strong');
-var $gameCategory     = $('.game-frame .game-round .game-category strong');
-var $gameTimer        = $('.game-frame .game-round .game-timer');
-var $guessedCorrect   = $('.game-frame .game-round .guessed-correct');
-var $leaveGame        = $('.game-frame .leave-game');
+var $gameFrame         = $('.game-frame');
+var $gameOverlay       = $('.game-frame .game-startOverlay');
+var $gameStartNumbers  = $('.game-frame .game-startOverlay .game-startingNumbers');
+var $gameTeamColor     = $('.game-frame .game-header .team-color');
+var $gameBlueScore     = $('.game-frame .game-header .game-score .game-blueScore .blue-score');
+var $gameRedScore      = $('.game-frame .game-header .game-score .game-redScore .red-score');
+var $gameGameCodeLabel = $('.game-frame .game-header .game-gameCode span')
+var $gameGameCode      = $('.game-frame .game-header .game-gameCode strong');
+var $gameCategory      = $('.game-frame .game-round .game-category strong');
+var $gameTimer         = $('.game-frame .game-round .game-timer');
+var $guessedCorrect    = $('.game-frame .game-round .guessed-correct');
+var $leaveGame         = $('.game-frame .leave-game');
 
 /* Team Lists */
 var $teamBlue = $('.team-blue');
@@ -138,10 +139,19 @@ function updateGameStatus(gameStatus) {
     $gameBlueScore.text(gameStatus.score.blue);
     $gameRedScore.text(gameStatus.score.red);
     
+    if(!leader) {
+        $gameGameCodeLabel.text('Leader is');
+        $gameGameCode.text(gameStatus.leader);
+    }
+    
     // Update current round
     $gameCategory.text(gameStatus.round.category);
     timer = gameStatus.round.currentTime;
-    updateTimer(timer);
+    if(gameStatus.inRound) {
+        countDownTimer(timer);
+    } else {
+        updateTimer(timer);
+    }
 }
 
 function updatePlayerList(players) {
@@ -248,6 +258,7 @@ $joinGame.click(function() {
 /* Create Game */
 
 $startGameButton.click(function() {
+    leader = true;
     var roundTime = parseInt($roundTime.val(), 10);
     socket.emit('create game', {
         roundTime: roundTime
@@ -255,6 +266,7 @@ $startGameButton.click(function() {
     
     socket.on('game id', function(id) {
         $gameCode.text(id);
+        $gameGameCodeLabel.text('Gamecode');
         $gameGameCode.text(id);
         transitionRight($createGameFrame, $gameCodeFrame);
     });
@@ -263,7 +275,6 @@ $startGameButton.click(function() {
 /* Game Code */
 
 $gameCodeReady.click(function() {
-    $gameCodeCard.show();
     $guessedCorrect.show();
     transitionRight($gameCodeFrame, $gameFrame);
     
@@ -317,8 +328,8 @@ $guessedCorrect.click(function() {
 $leaveGame.click(function() {
     socket.emit('leave game');
     showMenu();
-    $gameCodeCard.hide();
     $guessedCorrect.hide();
+    leader = false;
 });
 
 // Update values
@@ -338,9 +349,7 @@ $usernameButton.prop('disabled', $usernameInput.val() === '');
 $joinGameButton.prop('disabled', $joinGameCode.val() === '');
 $joinGameError.hide();
 
-$gameCodeCard.hide();
 $guessedCorrect.hide();
-
 $gameOverlay.hide();
 $gameStartNumbers.hide();
 updateTimer(timer);

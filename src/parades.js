@@ -189,6 +189,7 @@ Game.prototype.getStatus = function() {
     response.score.blue = this.blueScore;
     response.score.red  = this.redScore;
     
+    response.inRound = this.inRound;
     response.round = {};
     response.round.category = this.round.category;
     response.round.currentTime = this.round.currentTime;
@@ -250,18 +251,17 @@ Game.prototype.chooseCategory = function() {
 
 // Starts a new round
 Game.prototype.startRound = function() {
+    console.log('Start game');
     // this.emit is out of scope in setTimeout function
     var that = this;
-
-    console.log('Start game');
     this.gameStarted = true;
-    this.inRound = true;
+
     this.emitStatus();
     this.emit('start animation');
 
     // Starting animation takes 5 seconds
     this.round.currentTime = this.options.roundTime;
-
+    this.inRound = true;
     setTimeout(function() {
         that.emit('count down', that.round.currentTime);
 
