@@ -143,6 +143,7 @@ function Game(io, socketId, username, options) {
     }
     
     // Members array
+    this.leader  = username;
     this.players = {};
     this.players[socketId] =
     {
@@ -182,12 +183,13 @@ function Game(io, socketId, username, options) {
 Game.prototype.getStatus = function() {
     var response = {};
     
+    response.leader = this.leader;
+    
     response.score = {};
     response.score.blue = this.blueScore;
     response.score.red  = this.redScore;
     
     response.round = {};
-    // Dummy values, implement later
     response.round.category = this.round.category;
     response.round.currentTime = this.round.currentTime;
     
@@ -252,29 +254,29 @@ Game.prototype.startRound = function() {
     var that = this;
 
     console.log('Start game');
-    // Start game since it isn't already started
     this.gameStarted = true;
+    this.inRound = true;
     this.emitStatus();
     this.emit('start animation');
 
     // Starting animation takes 5 seconds
-    var startTime = this.options.roundTime;
+    this.round.currentTime = this.options.roundTime;
 
     setTimeout(function() {
-        that.emit('count down', startTime);
+        that.emit('count down', that.round.currentTime);
 
         that.timer = setInterval(function() {
-            if(--that.roundTime <= 0) {
+            if(--that.round.currentTime <= 0) {
                 // Round is over
                 that.endRound();
             }
         }, 1000);
     }, 5000);
-    this.inRound = false;
 }
 
 Game.prototype.endRound = function() {
     if(this.inRound && typeof this.timer !== 'undefined') {
+        this.inRound = false;
         clearInterval(this.timer);
         
         var timeLeft = this.options.roundTime - this.round.currentTime;
@@ -342,7 +344,7 @@ Game.prototype.playerChangeTeam = function(socketId, team) {
 
 // Makes a player leave a game
 Game.prototype.playerLeave = function(socketId) {
-    console.log('Player ' + this.players[socketId].username + ' left');
+    console.log('Player left');
     delete this.players[socketId];
     this.emitPlayers();
 }
