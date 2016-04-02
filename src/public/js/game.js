@@ -1,18 +1,18 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2016 Michael Gira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -80,21 +80,21 @@ function showMenu() {
     // Hide frames in case we have to skip multiple
     $frames.not('.active').not($menuFrame).css('visibility', 'hidden');
     $frames.removeClass('active');
-    
+
     // Transition frames to the right
     $frames.not($menuFrame).animate({
         right: '-100%'
     }, 600, 'easeOutCubic', function() {
         $frames.css('visibility', 'visible');
     });
-    
+
     // Show Menu
     $menuFrame.animate({
         right: 0
     }, 600, 'easeOutCubic', function() {
         $menuFrame.addClass('active');
     });
-    
+
     // Trigger the bounce animation for the menu title
     $titleHeader.delay(100).animate({
         top: 0
@@ -103,12 +103,12 @@ function showMenu() {
 
 function transitionLeft($fromFrame, $toFrame) {
     $frames.removeClass('active');
-    
+
     // Transition original frame to the right
     $fromFrame.animate({
         right: '-100%'
     }, 600, 'easeOutCubic');
-    
+
     // Bring next frame from the left
     $toFrame.animate({
         right: 0
@@ -119,13 +119,13 @@ function transitionLeft($fromFrame, $toFrame) {
 
 function transitionRight($fromFrame, $toFrame) {
     $frames.removeClass('active');
-    
+
     // Transition original frame to the left
     $fromFrame.animate({
         right: '100%'
     }, 600, 'easeOutCubic');
-    
-    
+
+
     // Bring next frame from the right
     $toFrame.animate({
         right: 0
@@ -138,12 +138,12 @@ function updateGameStatus(gameStatus) {
     // Update scoreboard
     $gameBlueScore.text(gameStatus.score.blue);
     $gameRedScore.text(gameStatus.score.red);
-    
+
     if(!leader) {
         $gameGameCodeLabel.text('Leader is');
         $gameGameCode.text(gameStatus.leader);
     }
-    
+
     // Update current round
     $gameCategory.text(gameStatus.round.category);
     timer = gameStatus.round.currentTime;
@@ -155,12 +155,12 @@ function updateGameStatus(gameStatus) {
 }
 
 function updatePlayerList(players) {
-    
+
     $teamBlue.html('');
     $teamRed.html('');
     var blueTeam = players.blue;
     var redTeam  = players.red;
-    
+
     for(var i = 0; i < players.blue.length; i++) {
         $teamBlue.append('<li class="list-group-item list-group-item-info">' + players.blue[i] + '</li>');
     }
@@ -177,16 +177,16 @@ function updateTimer(seconds) {
     if(seconds < 0) {
         seconds = 0;
     }
-    
+
     var secondValue = seconds % 60;
     var minuteValue = (seconds - secondValue) / 60;
-    
+
     // Add leading zero
     var secondString = secondValue.toString();
     if(secondString.length < 2) {
         secondString = '0' + secondString;
     }
-    
+
     $gameTimer.text(minuteValue + ':' + secondString);
 }
 
@@ -194,7 +194,7 @@ function updateTimer(seconds) {
 function countDownTimer(seconds) {
     updateTimer(seconds);
     var timer = setInterval(function() {
-        
+
         // Stop timer if person left the game
         if(!$gameFrame.hasClass('active')) {
             clearInterval(timer);
@@ -263,7 +263,7 @@ $startGameButton.click(function() {
     socket.emit('create game', {
         roundTime: roundTime
     });
-    
+
     socket.on('game id', function(id) {
         $gameCode.text(id);
         $gameGameCodeLabel.text('Gamecode');
@@ -277,7 +277,7 @@ $startGameButton.click(function() {
 $gameCodeReady.click(function() {
     $guessedCorrect.show();
     transitionRight($gameCodeFrame, $gameFrame);
-    
+
     setTimeout(function() {
         socket.emit('start game');
     }, 800);
@@ -299,15 +299,15 @@ $joinGameCode.bind('keydown keyup', function(event) {
 $joinGameForm.submit(function(event) {
     event.preventDefault();
     socket.emit('join game', $joinGameCode.val());
-    
+
     socket.on('join game response', function(success, playerData, gameData) {
         if(success) {
             $joinGameError.fadeOut();
-            
+
             // Prepare game
             updatePlayerStatus(playerData);
             updateGameStatus(gameData);
-            
+
             transitionRight($joinGameFrame, $gameFrame);
         } else {
             $joinGameError.fadeIn();

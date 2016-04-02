@@ -1,6 +1,0 @@
-// Use this to create an actual config.js with filled out information!
-
-module.exports =
-{
-    mongodbURI: ''
-};

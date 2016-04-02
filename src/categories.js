@@ -14,7 +14,7 @@ var categories =
 		'Michael',
         'Surprisingly, Michael',
 	],
-    
+
     'Weird Song': [
         'Song 1',
         'Song 2',

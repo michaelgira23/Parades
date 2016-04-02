@@ -1,8 +1,8 @@
 /*
  * The MIT License (MIT)
- * 
+ *
  * Copyright (c) 2016 Michael Gira
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -12,7 +12,7 @@
  * 
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -32,25 +32,25 @@ var games  = module.exports.games = {};
 var gameCodeLength = 4;
 
 module.exports = function(io) {
-    
+
     io.on('connection', function(socket) {
         socket.on('username', function(username) {
-            
+
             socket.on('create game', function(options) {
                 if(!playerInGame(socket.id)) {
-                    
+
                     var gameId = initializeGame(io, socket.id, username, options);
                     socket.emit('game id', gameId);
-                    
+
                     socket.on('start game', function() {
                         if(gameExists(gameId)) {
                             games[gameId].startGame();
                         }
                     });
-                    
+
                     socket.on('guessed correct', function() {
                         if(gameExists(gameId)) {
-                            
+
                         }
                     });
 
@@ -59,7 +59,7 @@ module.exports = function(io) {
                             games[gameId].endGame();
                         }
                     });
-                    
+
                     // Also stop game if leader disconnects
                     socket.on('disconnect', function() {
                         if(gameExists(gameId)) {
@@ -68,20 +68,20 @@ module.exports = function(io) {
                     });
                 }
             });
-            
+
             socket.on('join game', function(gameId) {
                 if(!playerInGame(socket.id) && gameExists(gameId)) {
-                    
+
                     games[gameId].playerJoin(socket, username);
                     // Send player data and game data
                     socket.emit('join game response', true, games[gameId].players[socket.id], games[gameId].getStatus());
-                    
+
                     socket.on('leave game', function() {
                         if(gameExists(gameId)) {
                             games[gameId].playerLeave(socket.id);
                         }
                     });
-                    
+
                     // Leave if player disconnects
                     socket.on('disconnect', function() {
                         if(gameExists(gameId)) {
@@ -135,13 +135,13 @@ function playerInGame(socketId) {
 function Game(io, socketId, username, options) {
     console.log('Create game instance');
     this.io = io;
-    
+
     // Game ID
     this.gameId = generateGameId();
     while(gameExists(this.gameId)) {
         this.gameId = generateGameId();
     }
-    
+
     // Members array
     this.leader  = username;
     this.players = {};
@@ -151,30 +151,30 @@ function Game(io, socketId, username, options) {
         team      : 'spectator',
         permission: 1,
     };
-    
+
     // Options
     this.options = {};
-    
+
     // Round Time
     if(typeof options.roundTime === 'number' && options.roundTime !== NaN) {
         this.options.roundTime = options.roundTime;
     } else {
         this.options.roundTime = 90;
     }
-    
+
     // General values
     this.blueScore = 0;
     this.redScore  = 0;
-    
+
     this.round = {};
     this.round.team  = 'Blue';
     this.round.category    = 'Unknown';
     this.round.guessing    = 'Unknown';
     this.round.currentTime = this.options.roundTime;
-    
+
     this.gameStarted = false;
     this.inRound     = false;
-    
+
     this.emitStatus();
     this.emitPlayers();
 }
@@ -182,18 +182,18 @@ function Game(io, socketId, username, options) {
 // Returns a JSON containing stats about the current round
 Game.prototype.getStatus = function() {
     var response = {};
-    
+
     response.leader = this.leader;
-    
+
     response.score = {};
     response.score.blue = this.blueScore;
     response.score.red  = this.redScore;
-    
+
     response.inRound = this.inRound;
     response.round = {};
     response.round.category = this.round.category;
     response.round.currentTime = this.round.currentTime;
-    
+
     return response;
 }
 
@@ -208,15 +208,15 @@ Game.prototype.emit = function(event, data) {
 // Emits an array of players to everyone in the game
 Game.prototype.emitPlayers = function() {
     var playersList  = {};
-    
+
     playersList.blue = [];
     playersList.red  = [];
     playersList.spectator = [];
-    
+
     _.each(this.players, function(value, key) {
         playersList[value.team].push(value.username);
     });
-    
+
     this.emit('player list', playersList);
 }
 
@@ -278,19 +278,19 @@ Game.prototype.endRound = function() {
     if(this.inRound && typeof this.timer !== 'undefined') {
         this.inRound = false;
         clearInterval(this.timer);
-        
+
         var timeLeft = this.options.roundTime - this.round.currentTime;
-        
+
         if(timeLeft <= 0) {
             // Team lost
-            
+
             // Determine which team can "steal" the round
             if(this.round.team === 'blue') {
                 var stealTeam = 'red';
             } else {
                 var stealTeam = 'blue';
             }
-            
+
             this.emit('team steal', stealTeam);
         } else {
             // Team won
@@ -309,24 +309,24 @@ Game.prototype.endGame = function() {
 // Makes a player join a game
 Game.prototype.playerJoin = function(socket, username) {
     console.log('Player ' + username + ' joined');
-    
+
     // Determine which team new guy should go on
     var blueCount = this.getTeam('blue').length;
     var redCount  = this.getTeam('red').length;
-    
+
     if(blueCount > redCount) {
         var team = 'red';
     } else {
         var team = 'blue';
     }
-    
+
     this.players[socket.id] =
     {
         username  : username,
         team      : team,
         permission: 0,
     };
-    
+
     this.emitPlayers();
 }
 
