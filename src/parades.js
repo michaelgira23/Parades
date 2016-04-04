@@ -79,17 +79,26 @@ module.exports = function(io) {
                     socket.on('steal round', function(success) {
                         if(permission === 1 && gameExists(gameId) && pendingStealResponse) {
                             if(success) {
-                                game.score[game.round.team]++;
+                                // Opposite team should get the score
+                                if(game.round.team === 'blue') {
+                                    var stealTeam = 'red';
+                                } else {
+                                    var stealTeam = 'blue';
+                                }
+                                game.score[stealTeam]++;
                                 success = true;
                             } else {
                                 success = false;
                             }
+                            game.emitStatus();
                             game.emit('stole round', {
                                 team   : pendingStealResponse,
                                 success: success,
                             });
-                            game.emitStatus();
                             pendingStealResponse = false;
+                            setTimeout(function() {
+                                game.resetRound();
+                            }, 5000);
                         }
                     });
 
@@ -240,6 +249,7 @@ Game.prototype.getStatus = function() {
     response.inRound = this.inRound;
     
     response.round = {};
+    response.round.team = this.round.team;
     response.round.category = this.round.category;
     response.round.currentTime = this.round.currentTime;
 
@@ -312,6 +322,7 @@ Game.prototype.drawValue = function() {
         this.chooseCategory();
     }
     this.round.guessing = categories.getRandomValue(this.round.category);
+    console.log('Draw value', this.round.guessing);
     return this.round.guessing;
 }
 
@@ -323,6 +334,7 @@ Game.prototype.startRound = function() {
         var that = this;
 
         this.emitStatus();
+        this.emitGuessing();
         this.emit('start animation');
         this.inRound = true;
 
@@ -333,9 +345,11 @@ Game.prototype.startRound = function() {
             that.emit('count down', that.round.currentTime);
 
             that.timer = setInterval(function() {
-                if(--that.round.currentTime <= 0) {
+                if(that.round.currentTime - 1 < 0) {
                     // Round is over
                     that.endRound();
+                } else {
+                    that.round.currentTime--;
                 }
             }, 1000);
         }, 5000);
@@ -373,6 +387,11 @@ Game.prototype.endRound = function() {
             
             this.score[this.round.team]++;
             this.emitStatus();
+            
+            var that = this;
+            setTimeout(function() {
+                that.resetRound();
+            }, 5000);
         }
     }
 }
@@ -384,7 +403,10 @@ Game.prototype.resetRound = function() {
     } else {
         this.round.team = 'blue';
     }
+    this.drawValue();
     this.emitStatus();
+    this.emitGuessing();
+    this.emitToLeader('reset round');
 }
 
 // Stops the game

@@ -79,7 +79,6 @@ var $gameGameCode       = $('.game-frame .game-header .game-gameCode strong');
 var $gameCategory       = $('.game-frame .game-round .game-category strong');
 var $gameTimer          = $('.game-frame .game-round .game-timer');
 var $guessedCorrect     = $('.game-frame .game-round .guessed-correct');
-var $gameGuessingLabel  = $('.game-frame .game-round .game-guessing');
 var $gameGuessingTeam   = $('.game-frame .game-round .game-guessing strong:first-child');
 var $gameGuessingValue  = $('.game-frame .game-round .game-guessing strong:last-child');
 var $gameStealWrong     = $('.game-frame .game-round .steal-wrong');
@@ -165,6 +164,14 @@ function updateGameStatus(gameStatus) {
 
     // Update current round
     $gameCategory.text(gameStatus.round.category);
+    
+    // Update guessing team
+    $gameGuessingTeam.text(gameStatus.round.team.capitalize() + ' Team');
+    if(!leader) {
+        $gameGuessingValue.text('');
+    }
+    
+    // Update timer
     if(gameStatus.inRound) {
         countDownTimer(gameStatus.round.currentTime);
     } else {
@@ -318,7 +325,6 @@ $startGameButton.click(function() {
 /* Game Code */
 
 $gameCodeReady.click(function() {
-    $gameGuessingLabel.show();
     transitionRight($gameCodeFrame, $categoryFrame);
 });
 
@@ -384,17 +390,20 @@ $guessedCorrect.click(function() {
 
 $gameStealWrong.click(function() {
     socket.emit('steal round', false);
+    $gameStealWrong.fadeOut();
+    $gameStealRight.fadeOut();
 });
 
 $gameStealRight.click(function() {
     socket.emit('steal round', true);
+    $gameStealWrong.fadeOut();
+    $gameStealRight.fadeOut();
 });
 
 $leaveGame.click(function() {
     socket.emit('leave game');
     showMenu();
     $guessedCorrect.hide();
-    $gameGuessingLabel.hide();
     leader = false;
 });
 
@@ -414,25 +423,34 @@ socket.on('stop timer', function(seconds) {
 
 // End of round messages
 socket.on('team won', function(team) {
-    displayMessage(team.capitalize() + ' Team won!');
+    displayMessage(4000, team.capitalize() + ' Team won!');
+});
+
+socket.on('reset round', function() {
+    if(leader) {
+        transitionLeft($gameFrame, $categoryFrame);
+    }
 });
 
 socket.on('team steal', function(teams) {
     displayMessage(2000, teams.team.capitalize() + ' Team lost!');
     setTimeout(function() {
         displayMessage(4000, teams.stealTeam.capitalize() + ' Team has the chance to steal the round.');
-        setTimeout(function() {
-            $gameStealWrong.fadeIn();
-            $gameStealRight.fadeIn();
-        }, 5000);
+        $gameGuessingTeam.text(teams.stealTeam.capitalize() + ' Team');
+        if(leader) {
+            setTimeout(function() {
+                $gameStealWrong.fadeIn();
+                $gameStealRight.fadeIn();
+            }, 5000);
+        }
     }, 3000);
 });
 
 socket.on('stole round', function(stealers) {
     if(stealers.success) {
-        displayMessage(4000, stealers.team + ' guessed correctly!');
+        displayMessage(4000, stealers.team.capitalize() + ' guessed correctly!');
     } else {
-        displayMessage(4000, stealers.team + ' guessed wrongly!');
+        displayMessage(4000, stealers.team.capitalize() + ' guessed wrongly!');
     }
 });
 
@@ -446,7 +464,6 @@ $joinGameButton.prop('disabled', $joinGameCode.val() === '');
 $joinGameError.hide();
 
 $guessedCorrect.hide();
-$gameGuessingLabel.hide();
 $gameOverlay.hide();
 $gameStartNumbers.hide();
 $gameOverlayMessage.hide();
