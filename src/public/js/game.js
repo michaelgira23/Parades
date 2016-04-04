@@ -23,8 +23,8 @@
  */
 
 var socket = io();
-var timer  = 0; // Default time on timer in seconds
 var leader = false;
+var timer;
 
 var $frames = $('.frame');
 
@@ -57,23 +57,42 @@ var $joinGameForm   = $('.joinGame-frame .joinGame-submitCode');
 var $joinGameCode   = $('.joinGame-frame .joinGame-submitCode input')
 var $joinGameButton = $('.joinGame-frame .joinGame-submitCode button');
 
+/* Choose Category */
+var $categoryFrame     = $('.chooseCategory-frame');
+var $guessingCategory  = $('.chooseCategory-frame .category .guessingCategory');
+var $guessingTeam      = $('.chooseCategory-frame .guessing .guessingTeam');
+var $guessingValue     = $('.chooseCategory-frame .guessing .guessingValue');
+var $guessingGameReady = $('.chooseCategory-frame .gameReady');
+var $anotherCategory   = $('.chooseCategory-frame .anotherCategory');
+var $anotherValue      = $('.chooseCategory-frame .anotherValue');
+
 /* Actual Game */
-var $gameFrame         = $('.game-frame');
-var $gameOverlay       = $('.game-frame .game-startOverlay');
-var $gameStartNumbers  = $('.game-frame .game-startOverlay .game-startingNumbers');
-var $gameTeamColor     = $('.game-frame .game-header .team-color');
-var $gameBlueScore     = $('.game-frame .game-header .game-score .game-blueScore .blue-score');
-var $gameRedScore      = $('.game-frame .game-header .game-score .game-redScore .red-score');
-var $gameGameCodeLabel = $('.game-frame .game-header .game-gameCode span')
-var $gameGameCode      = $('.game-frame .game-header .game-gameCode strong');
-var $gameCategory      = $('.game-frame .game-round .game-category strong');
-var $gameTimer         = $('.game-frame .game-round .game-timer');
-var $guessedCorrect    = $('.game-frame .game-round .guessed-correct');
-var $leaveGame         = $('.game-frame .leave-game');
+var $gameFrame          = $('.game-frame');
+var $gameOverlay        = $('.game-frame .game-startOverlay');
+var $gameStartNumbers   = $('.game-frame .game-startOverlay .game-startingNumbers');
+var $gameOverlayMessage = $('.game-frame .game-startOverlay .game-overlayMessage');
+var $gameTeamColor      = $('.game-frame .game-header .team-color');
+var $gameBlueScore      = $('.game-frame .game-header .game-score .game-blueScore .blue-score');
+var $gameRedScore       = $('.game-frame .game-header .game-score .game-redScore .red-score');
+var $gameGameCodeLabel  = $('.game-frame .game-header .game-gameCode span')
+var $gameGameCode       = $('.game-frame .game-header .game-gameCode strong');
+var $gameCategory       = $('.game-frame .game-round .game-category strong');
+var $gameTimer          = $('.game-frame .game-round .game-timer');
+var $guessedCorrect     = $('.game-frame .game-round .guessed-correct');
+var $gameGuessingLabel  = $('.game-frame .game-round .game-guessing');
+var $gameGuessingTeam   = $('.game-frame .game-round .game-guessing strong:first-child');
+var $gameGuessingValue  = $('.game-frame .game-round .game-guessing strong:last-child');
+var $gameStealWrong     = $('.game-frame .game-round .steal-wrong');
+var $gameStealRight     = $('.game-frame .game-round .steal-right');
+var $leaveGame          = $('.game-frame .leave-game');
 
 /* Team Lists */
 var $teamBlue = $('.team-blue');
 var $teamRed  = $('.team-red');
+
+String.prototype.capitalize = function() {
+    return this[0].toUpperCase() + this.slice(1);
+}
 
 function showMenu() {
     $titleHeader.css('top', '-100vh');
@@ -141,16 +160,15 @@ function updateGameStatus(gameStatus) {
 
     if(!leader) {
         $gameGameCodeLabel.text('Leader is');
-        $gameGameCode.text(gameStatus.leader);
+        $gameGameCode.text(gameStatus.leader.username);
     }
 
     // Update current round
     $gameCategory.text(gameStatus.round.category);
-    timer = gameStatus.round.currentTime;
     if(gameStatus.inRound) {
-        countDownTimer(timer);
+        countDownTimer(gameStatus.round.currentTime);
     } else {
-        updateTimer(timer);
+        updateTimer(gameStatus.round.currentTime);
     }
 }
 
@@ -173,6 +191,18 @@ function updatePlayerStatus(playerData) {
     $gameTeamColor.removeClass('blue').removeClass('red').addClass(playerData.team);
 }
 
+function updateGuessing(guessing) {
+    // Capitalize team
+    var team = guessing.team.capitalize();
+    
+    $guessingCategory.text(guessing.category);
+    $guessingTeam.text(team + ' Team');
+    $guessingValue.text(guessing.value);
+    
+    $gameGuessingTeam.text(team + ' Team');
+    $gameGuessingValue.text(guessing.value);
+}
+
 function updateTimer(seconds) {
     if(seconds < 0) {
         seconds = 0;
@@ -193,7 +223,7 @@ function updateTimer(seconds) {
 // Will count down the number of seconds on the timer
 function countDownTimer(seconds) {
     updateTimer(seconds);
-    var timer = setInterval(function() {
+    timer = setInterval(function() {
 
         // Stop timer if person left the game
         if(!$gameFrame.hasClass('active')) {
@@ -220,12 +250,25 @@ function startingAnimation() {
                         $gameOverlay.fadeOut('500');
                         setTimeout(function() {
                             $gameStartNumbers.hide();
+                            if(leader) {
+                                $guessedCorrect.fadeIn();
+                            }
                         }, 500);
                     }, 1000);
                 }, 1000);
             }, 1000);
         }, 1000);
     }, 500);
+}
+
+// Display a message using the fade overlay. Lasts 1 second more than the given milliseconds
+function displayMessage(milliseconds, message) {
+    $gameOverlayMessage.text(message).show();
+    $gameOverlay.fadeIn('500');
+    setTimeout(function() {
+        $gameOverlay.fadeOut('500');
+        $gameOverlayMessage.hide();
+    }, milliseconds);
 }
 
 /* Make the buttons work */
@@ -275,17 +318,31 @@ $startGameButton.click(function() {
 /* Game Code */
 
 $gameCodeReady.click(function() {
-    $guessedCorrect.show();
-    transitionRight($gameCodeFrame, $gameFrame);
-
-    setTimeout(function() {
-        socket.emit('start game');
-    }, 800);
+    $gameGuessingLabel.show();
+    transitionRight($gameCodeFrame, $categoryFrame);
 });
 
 $gameCodeCancel.click(function() {
     socket.emit('leave game');
     transitionLeft($gameCodeFrame, $createGameFrame);
+});
+
+/* Choose Categories */
+
+$guessingGameReady.click(function() {
+    transitionRight($categoryFrame, $gameFrame);
+    setTimeout(function() {
+        socket.emit('game ready');
+    }, 800);
+});
+
+$anotherCategory.click(function() {
+    socket.emit('change category');
+});
+
+$anotherValue.click(function() {
+    console.log('help')
+    socket.emit('change value');
 });
 
 /* Join Game */
@@ -325,20 +382,59 @@ $guessedCorrect.click(function() {
     socket.emit('guessed correct');
 });
 
+$gameStealWrong.click(function() {
+    socket.emit('steal round', false);
+});
+
+$gameStealRight.click(function() {
+    socket.emit('steal round', true);
+});
+
 $leaveGame.click(function() {
     socket.emit('leave game');
     showMenu();
     $guessedCorrect.hide();
+    $gameGuessingLabel.hide();
     leader = false;
 });
 
 // Update values
 socket.on('game status', updateGameStatus);
 socket.on('player list', updatePlayerList);
+socket.on('guessing', updateGuessing);
 
 // Game components
 socket.on('start animation', startingAnimation);
 socket.on('count down', countDownTimer);
+socket.on('stop timer', function(seconds) {
+    clearInterval(timer);
+    updateTimer(seconds);
+    $guessedCorrect.fadeOut();
+});
+
+// End of round messages
+socket.on('team won', function(team) {
+    displayMessage(team.capitalize() + ' Team won!');
+});
+
+socket.on('team steal', function(teams) {
+    displayMessage(2000, teams.team.capitalize() + ' Team lost!');
+    setTimeout(function() {
+        displayMessage(4000, teams.stealTeam.capitalize() + ' Team has the chance to steal the round.');
+        setTimeout(function() {
+            $gameStealWrong.fadeIn();
+            $gameStealRight.fadeIn();
+        }, 5000);
+    }, 3000);
+});
+
+socket.on('stole round', function(stealers) {
+    if(stealers.success) {
+        displayMessage(4000, stealers.team + ' guessed correctly!');
+    } else {
+        displayMessage(4000, stealers.team + ' guessed wrongly!');
+    }
+});
 
 /* Actually do stuff */
 
@@ -350,9 +446,13 @@ $joinGameButton.prop('disabled', $joinGameCode.val() === '');
 $joinGameError.hide();
 
 $guessedCorrect.hide();
+$gameGuessingLabel.hide();
 $gameOverlay.hide();
 $gameStartNumbers.hide();
-updateTimer(timer);
+$gameOverlayMessage.hide();
+$gameStealWrong.hide();
+$gameStealRight.hide();
+updateTimer(0);
 
 showMenu();
 

@@ -58,7 +58,7 @@
                     <option value="90">1:30</option>
                     <option value="120">2:00</option>
                     <option value="150">2:30</option>
-                    <option value="280">3:00</option>
+                    <option value="180">3:00</option>
                 </select>
                 <div class="checkbox">
                     <label>
@@ -66,6 +66,7 @@
                         Keep same category throughout the whole round
                     </label>
                 </div>
+<!--
                 <h3>Categories</h3>
                 <ul class="list-group">
                     <li class="list-group-item">
@@ -81,6 +82,7 @@
                         </label>
                     </li>
                 </ul>
+-->
             </div>
         </div>
 
@@ -121,17 +123,29 @@
             </form>
         </div>
 
-        <!-- Spinner -->
-		<div class="frame spinner-frame">
-			<h3 class="spinner-category">Click to Spin!</h3>
-			<div class="spinner card col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-4"></div>
-			<button class="spinner-trigger btn btn-info">Spin!</button>
+		<!-- Draw something to guess every round -->
+
+		<div class="frame chooseCategory-frame">
+			<h1 class="category">
+				<span>Category is</span>
+				<strong class="guessingCategory">Unknown</strong>
+			</h1>
+            <span class="divider"></span>
+            <h2 class="guessing">
+				<strong class="guessingTeam"></strong>
+                <span>is trying to guess</span>
+				<strong class="guessingValue">Unknown</strong>
+			</h2>
+            <button class="gameReady btn btn-success btn-lg">Start Game!</button>
+			<button class="anotherCategory btn btn-primary-outline">Choose another category</button>
+            <button class="anotherValue btn btn-info-outline">Choose something else to guess</button>
 		</div>
 
         <!-- Actual Game -->
         <div class="frame game-frame">
             <div class="game-startOverlay">
                 <div class="game-startingNumbers">3</div>
+                <div class="game-overlayMessage"></div>
             </div>
             <div class="game-header">
                 <span class="team-color"></span>
@@ -154,6 +168,13 @@
                 <p class="game-category">Category is: <strong>Unknown</strong></p>
                 <h1 class="game-timer">0:00</h1>
                 <button class="guessed-correct btn btn-success btn-lg">Team Guessed Correctly!</button>
+                <p class="game-guessing">
+                    <strong>Team</strong>
+                    is trying to guess
+                    <strong>Unknown</strong>
+                </p>
+                <button class="steal-wrong btn btn-danger">Team guessed wrong</button>
+                <button class="steal-right btn btn-success-outline">Team guessed correctly!</button>
             </div>
             <div class="game-teamList">
                 <div class="game-teamBlue col-xs-12 col-md-5 col-lg-4">
@@ -169,6 +190,13 @@
                 <button class="leave-game btn btn-danger-outline">Leave Game!</button>
             </div>
         </div>
+
+		<!-- Spinner -->
+		<div class="frame spinner-frame">
+			<h3 class="spinner-category">Click to Spin!</h3>
+			<div class="spinner card col-xs-12 col-sm-10 col-md-8 col-lg-6 col-lg-4"></div>
+			<button class="spinner-trigger btn btn-info">Spin!</button>
+		</div>
 
 <!--
 		<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>

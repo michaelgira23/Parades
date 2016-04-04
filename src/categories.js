@@ -1,3 +1,7 @@
+var Random = require("random-js");
+var random = new Random(Random.engines.mt19937().autoSeed());
+var _      = require('underscore');
+
 // Move to database later maybe
 var categories =
 {

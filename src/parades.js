@@ -9,7 +9,7 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
  *
@@ -30,40 +30,81 @@ var categories = require(__dirname + '/categories.js');
 
 var games  = module.exports.games = {};
 var gameCodeLength = 4;
+var pendingStealResponse = false;
 
 module.exports = function(io) {
 
     io.on('connection', function(socket) {
         socket.on('username', function(username) {
-
+            var permission = 0;
+            
             socket.on('create game', function(options) {
                 if(!playerInGame(socket.id)) {
-
+                    
                     var gameId = initializeGame(io, socket.id, username, options);
+                    var game   = games[gameId];
+                    permission = 1;
+                    
                     socket.emit('game id', gameId);
+                    
+                    socket.on('change category', function() {
+                        if(permission === 1 && gameExists(gameId) && !game.inRound) {
+                            game.chooseCategory();
+                            game.drawValue();
+                            game.emitGuessing();
+                        }
+                    });
 
-                    socket.on('start game', function() {
-                        if(gameExists(gameId)) {
-                            games[gameId].startGame();
+                    socket.on('change value', function() {
+                        console.log('help')
+                        if(permission === 1 && gameExists(gameId) && !game.inRound) {
+                            game.drawValue();
+                            game.emitGuessing();
+                        }
+                    });
+
+                    socket.on('game ready', function() {
+                        if(permission === 1 && gameExists(gameId) && !game.inRound) {
+                            game.startRound();
                         }
                     });
 
                     socket.on('guessed correct', function() {
-                        if(gameExists(gameId)) {
-
+                        if(permission === 1 && gameExists(gameId) && game.inRound) {
+                            console.log('guessed correct');
+                            game.endRound();
+                        }
+                    });
+                    
+                    socket.on('steal round', function(success) {
+                        if(permission === 1 && gameExists(gameId) && pendingStealResponse) {
+                            if(success) {
+                                game.score[game.round.team]++;
+                                success = true;
+                            } else {
+                                success = false;
+                            }
+                            game.emit('stole round', {
+                                team   : pendingStealResponse,
+                                success: success,
+                            });
+                            game.emitStatus();
+                            pendingStealResponse = false;
                         }
                     });
 
                     socket.on('leave game', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].endGame();
+                            permission = 0;
+                            game.endGame();
                         }
                     });
 
                     // Also stop game if leader disconnects
                     socket.on('disconnect', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].endGame();
+                            permission = 0;
+                            game.endGame();
                         }
                     });
                 }
@@ -71,21 +112,24 @@ module.exports = function(io) {
 
             socket.on('join game', function(gameId) {
                 if(!playerInGame(socket.id) && gameExists(gameId)) {
-
-                    games[gameId].playerJoin(socket, username);
+                    
+                    var permission = 0;
+                    var game = games[gameId];
+                    game.playerJoin(socket, username);
+                    
                     // Send player data and game data
-                    socket.emit('join game response', true, games[gameId].players[socket.id], games[gameId].getStatus());
+                    socket.emit('join game response', true, game.players[socket.id], game.getStatus());
 
                     socket.on('leave game', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].playerLeave(socket.id);
+                            game.playerLeave(socket.id);
                         }
                     });
 
                     // Leave if player disconnects
                     socket.on('disconnect', function() {
                         if(gameExists(gameId)) {
-                            games[gameId].playerLeave(socket.id);
+                            game.playerLeave(socket.id);
                         }
                     });
                 } else {
@@ -143,14 +187,14 @@ function Game(io, socketId, username, options) {
     }
 
     // Members array
-    this.leader  = username;
-    this.players = {};
-    this.players[socketId] =
+    this.leaderId = socketId;
+    this.leader   =
     {
         username  : username,
         team      : 'spectator',
-        permission: 1,
     };
+    this.players = {};
+    this.players[socketId] = this.leader;
 
     // Options
     this.options = {};
@@ -163,20 +207,28 @@ function Game(io, socketId, username, options) {
     }
 
     // General values
-    this.blueScore = 0;
-    this.redScore  = 0;
+    this.score = {};
+    this.score.blue = 0;
+    this.score.red  = 0;
 
     this.round = {};
-    this.round.team  = 'Blue';
-    this.round.category    = 'Unknown';
-    this.round.guessing    = 'Unknown';
-    this.round.currentTime = this.options.roundTime;
 
-    this.gameStarted = false;
-    this.inRound     = false;
+    // Generate random team
+    if(random.integer(0, 1)) {
+        this.round.team  = 'blue';
+    } else {
+        this.round.team  = 'red';
+    }
+
+    this.round.currentTime = this.options.roundTime;
+    // Sets both round.category and round.guessing
+    this.drawValue();
+    
+    this.inRound = false;
 
     this.emitStatus();
     this.emitPlayers();
+    this.emitGuessing();
 }
 
 // Returns a JSON containing stats about the current round
@@ -184,12 +236,9 @@ Game.prototype.getStatus = function() {
     var response = {};
 
     response.leader = this.leader;
-
-    response.score = {};
-    response.score.blue = this.blueScore;
-    response.score.red  = this.redScore;
-
+    response.score = this.score;
     response.inRound = this.inRound;
+    
     response.round = {};
     response.round.category = this.round.category;
     response.round.currentTime = this.round.currentTime;
@@ -202,6 +251,20 @@ Game.prototype.emit = function(event, data) {
     var io = this.io;
     _.each(this.players, function(value, key) {
         io.to(key).emit(event, data);
+    });
+}
+
+// Emits something only to the leader
+Game.prototype.emitToLeader = function(event, data) {
+    this.io.to(this.leaderId).emit(event, data);
+}
+
+// Emit to leader category and value they're guessing
+Game.prototype.emitGuessing = function() {
+    this.emitToLeader('guessing', {
+        team    : this.round.team,
+        category: this.round.category,
+        value   : this.round.guessing,
     });
 }
 
@@ -236,67 +299,92 @@ Game.prototype.getTeam = function(team) {
     return players;
 }
 
-// Starts the game when everyone is ready
-Game.prototype.startGame = function() {
-    if(!this.gameStarted) {
-        this.startRound();
-    }
+// Draws a random category and returns it
+Game.prototype.chooseCategory = function() {
+    this.round.category = categories.getRandomCategory();
+    return this.round.category;
 }
 
-Game.prototype.chooseCategory = function() {
-    if(this.round.category === 'Unknown') {
-        this.round.category = getRandomCategory;
+// Draws a random value to guess, also chooses a category if it is unset
+Game.prototype.drawValue = function() {
+    console.log('draw value')
+    if(typeof this.round.category === 'undefined') {
+        this.chooseCategory();
     }
+    this.round.guessing = categories.getRandomValue(this.round.category);
+    return this.round.guessing;
 }
 
 // Starts a new round
 Game.prototype.startRound = function() {
-    console.log('Start game');
-    // this.emit is out of scope in setTimeout function
-    var that = this;
-    this.gameStarted = true;
+    if(!this.inRound) {
+        console.log('Start Round');
+        // this.emit is out of scope in setTimeout function
+        var that = this;
 
-    this.emitStatus();
-    this.emit('start animation');
+        this.emitStatus();
+        this.emit('start animation');
+        this.inRound = true;
 
-    // Starting animation takes 5 seconds
-    this.round.currentTime = this.options.roundTime;
-    this.inRound = true;
-    setTimeout(function() {
-        that.emit('count down', that.round.currentTime);
+        // Starting animation takes 5 seconds
+        this.round.currentTime = this.options.roundTime;
+        
+        setTimeout(function() {
+            that.emit('count down', that.round.currentTime);
 
-        that.timer = setInterval(function() {
-            if(--that.round.currentTime <= 0) {
-                // Round is over
-                that.endRound();
-            }
-        }, 1000);
-    }, 5000);
+            that.timer = setInterval(function() {
+                if(--that.round.currentTime <= 0) {
+                    // Round is over
+                    that.endRound();
+                }
+            }, 1000);
+        }, 5000);
+    }
 }
 
 Game.prototype.endRound = function() {
     if(this.inRound && typeof this.timer !== 'undefined') {
+        
+        console.log('End Round');
         this.inRound = false;
         clearInterval(this.timer);
+        this.emit('stop timer', this.round.currentTime);
 
-        var timeLeft = this.options.roundTime - this.round.currentTime;
-
-        if(timeLeft <= 0) {
+        if(this.round.currentTime <= 0) {
             // Team lost
-
+            console.log(this.round.team + ' team lost the round')
             // Determine which team can "steal" the round
             if(this.round.team === 'blue') {
                 var stealTeam = 'red';
             } else {
                 var stealTeam = 'blue';
             }
-
-            this.emit('team steal', stealTeam);
+            console.log(stealTeam + ' is able to steal the round!');
+            
+            pendingStealResponse = stealTeam;
+            this.emit('team steal', {
+                team     : this.round.team,
+                stealTeam: stealTeam,
+            });
         } else {
             // Team won
+            console.log(this.round.team + ' guessed correctly!');
             this.emit('team won', this.round.team);
+            
+            this.score[this.round.team]++;
+            this.emitStatus();
         }
     }
+}
+
+Game.prototype.resetRound = function() {
+    // Alternate teams
+    if(this.round.team === 'blue') {
+        this.round.team = 'red';
+    } else {
+        this.round.team = 'blue';
+    }
+    this.emitStatus();
 }
 
 // Stops the game
@@ -324,7 +412,6 @@ Game.prototype.playerJoin = function(socket, username) {
     {
         username  : username,
         team      : team,
-        permission: 0,
     };
 
     this.emitPlayers();

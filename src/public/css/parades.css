@@ -23,6 +23,15 @@ html, body {
     cursor: pointer;
 }
 
+.divider {
+    height: 1px;
+    width: 75%;
+    display: block;
+    margin: 0.75rem auto;
+
+    background-color: #E5E5E5;
+}
+
 /* Individual Frames */
 
 .frame {
@@ -138,17 +147,12 @@ html, body {
     text-align: center;
 }
 
-.createGame-frame .createGame-options .divider {
-    height: 1px;
-    width: 75%;
-    display: block;
-    margin: 0.75em auto;
-
-    background-color: #E5E5E5;
-}
-
 .createGame-frame .createGame-options h3:not(:first-child) {
     margin-top: 0.75em;
+}
+
+.createGame-frame .createGame-options .roundTime {
+    margin-bottom: 0.75em;
 }
 
 .createGame-frame .createGame-options ul label {
@@ -237,6 +241,48 @@ html, body {
     margin-top: 1em;
 }
 
+/* Choose Category Frame */
+
+.chooseCategory-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    text-align: center;
+    font-size: 1em;
+}
+
+.chooseCategory-frame .category {
+    font-size: 2.5em;
+}
+
+.chooseCategory-frame span {
+    font-weight: 300;
+}
+
+.chooseCategory-frame .divider {
+    max-width: 20em;
+}
+
+.chooseCategory-frame .guessing {
+    margin-bottom: 2em;
+    font-size: 1em;
+}
+
+.chooseCategory-frame button {
+    margin-bottom: 0.5rem;
+}
+
+.chooseCategory-frame .gameReady {
+    margin-bottom: 2em;
+}
+
+@media(min-width: 992px) {
+    .chooseCategory-frame {
+        font-size: 1.5em;
+    }
+}
+
 /* Game Frame */
 
 .game-frame .game-startOverlay {
@@ -249,13 +295,21 @@ html, body {
     align-items: center;
 
     z-index: 10;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
 }
 
 .game-frame .game-startOverlay .game-startingNumbers {
     color: white;
     font-size: 50vw;
     font-weight: 300;
+    text-align: center;
+}
+
+.game-frame .game-startOverlay .game-overlayMessage {
+    color: white;
+    font-size: 6rem;
+    font-weight: 300;
+    text-align: center;
 }
 
 .game-frame .game-header {
@@ -345,7 +399,8 @@ html, body {
     font-weight: 300;
 }
 
-.game-frame .game-round .game-category {
+.game-frame .game-round .game-category,
+.game-frame .game-round .game-guessing, {
     margin: 0;
     text-align: center;
 }
@@ -359,6 +414,20 @@ html, body {
 
 .game-frame .game-round .guessed-correct {
     z-index: 5;
+}
+
+.game-frame .game-round .game-guessing {
+    margin-top: 0.75rem;
+    text-align: center;
+}
+
+.game-frame .game-round .steal-wrong,
+.game-frame .game-round .steal-right {
+    z-index: 5;
+}
+
+.game-frame .game-round .steal-wrong {
+    margin-bottom: 0.5em;
 }
 
 .game-frame .game-teamList {
