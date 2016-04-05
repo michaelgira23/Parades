@@ -72,8 +72,6 @@ var $gameOverlay        = $('.game-frame .game-startOverlay');
 var $gameStartNumbers   = $('.game-frame .game-startOverlay .game-startingNumbers');
 var $gameOverlayMessage = $('.game-frame .game-startOverlay .game-overlayMessage');
 var $gameTeamColor      = $('.game-frame .game-header .team-color');
-var $gameBlueScore      = $('.game-frame .game-header .game-score .game-blueScore .blue-score');
-var $gameRedScore       = $('.game-frame .game-header .game-score .game-redScore .red-score');
 var $gameGameCodeLabel  = $('.game-frame .game-header .game-gameCode span')
 var $gameGameCode       = $('.game-frame .game-header .game-gameCode strong');
 var $gameCategory       = $('.game-frame .game-round .game-category strong');
@@ -85,9 +83,15 @@ var $gameStealWrong     = $('.game-frame .game-round .steal-wrong');
 var $gameStealRight     = $('.game-frame .game-round .steal-right');
 var $leaveGame          = $('.game-frame .leave-game');
 
+/* Score Frame */
+var $scoreFrame = $('.score-frame');
+
 /* Team Lists */
 var $teamBlue = $('.team-blue');
 var $teamRed  = $('.team-red');
+
+var $gameBlueScore      = $('.blue-score');
+var $gameRedScore       = $('.red-score');
 
 String.prototype.capitalize = function() {
     return this[0].toUpperCase() + this.slice(1);
@@ -278,6 +282,13 @@ function displayMessage(milliseconds, message) {
     }, milliseconds);
 }
 
+// Exits game and displays the score at the end of the round
+function roundScore() {
+	setTimeout(function() {
+		confetti.start();
+	}, 600);
+}
+
 /* Make the buttons work */
 
 $('.back-to-menu').click(showMenu);
@@ -402,9 +413,10 @@ $gameStealRight.click(function() {
 
 $leaveGame.click(function() {
     socket.emit('leave game');
-    showMenu();
     $guessedCorrect.hide();
     leader = false;
+	
+	roundScore();
 });
 
 // Update values
@@ -435,7 +447,7 @@ socket.on('reset round', function() {
 socket.on('team steal', function(teams) {
     displayMessage(2000, teams.team.capitalize() + ' Team lost!');
     setTimeout(function() {
-        displayMessage(4000, teams.stealTeam.capitalize() + ' Team has the chance to steal the round.');
+        displayMessage(4000, teams.stealTeam.capitalize() + ' has the chance to steal the round.');
         $gameGuessingTeam.text(teams.stealTeam.capitalize() + ' Team');
         if(leader) {
             setTimeout(function() {

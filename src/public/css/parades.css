@@ -307,7 +307,7 @@ html, body {
 
 .game-frame .game-startOverlay .game-overlayMessage {
     color: white;
-    font-size: 6rem;
+    font-size: 3rem;
     font-weight: 300;
     text-align: center;
 }
@@ -482,6 +482,10 @@ html, body {
 
 @media(min-width: 992px) {
 
+	.game-frame .game-startOverlay .game-overlayMessage {
+		font-size: 6rem;
+	}
+
     .game-frame .game-header {
         position: absolute;
     }
@@ -509,6 +513,56 @@ html, body {
     .game-frame .game-footer {
         position: absolute;
     }
+}
+
+/* Score Frame */
+
+.score-frame #confetti {
+	position: absolute;
+	z-index: 5;
+}
+
+.score-frame .scores {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	
+	display: flex;
+}
+
+.score-frame .scores .card {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	
+	height: 100%;
+	width: 100%;
+	
+	border-radius: 0;
+}
+
+.score-frame .scores .card strong {
+	font-size: 3rem;
+}
+
+.score-frame .scores .card span {
+	font-size: 6rem;
+	font-weight: 300;
+}
+
+.score-frame .score-footer {
+	position: absolute;
+	width: 100%;
+	bottom: 0;
+	padding-bottom: 1rem;
+	
+	display: flex;
+	justify-content: center;
+}
+
+.score-frame .score-footer .score-leave {
+	z-index: 10;
 }
 
 /* Spinner Frame */
