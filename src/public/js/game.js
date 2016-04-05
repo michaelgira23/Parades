@@ -284,6 +284,7 @@ function displayMessage(milliseconds, message) {
 
 // Exits game and displays the score at the end of the round
 function roundScore() {
+	transitionRight($gameFrame, $scoreFrame);
 	setTimeout(function() {
 		confetti.start();
 	}, 600);
