@@ -23,7 +23,7 @@
  */
 
 var socket = io();
-var leader = false;
+var team = null;
 var timer;
 
 var $frames = $('.frame');
@@ -85,6 +85,7 @@ var $leaveGame          = $('.game-frame .leave-game');
 
 /* Score Frame */
 var $scoreFrame = $('.score-frame');
+var $scoreLeave = $('.score-frame .score-footer .score-leave');
 
 /* Team Lists */
 var $teamBlue = $('.team-blue');
@@ -161,7 +162,7 @@ function updateGameStatus(gameStatus) {
     $gameBlueScore.text(gameStatus.score.blue);
     $gameRedScore.text(gameStatus.score.red);
 
-    if(!leader) {
+    if(team === 'leader') {
         $gameGameCodeLabel.text('Leader is');
         $gameGameCode.text(gameStatus.leader.username);
     }
@@ -171,7 +172,7 @@ function updateGameStatus(gameStatus) {
     
     // Update guessing team
     $gameGuessingTeam.text(gameStatus.round.team.capitalize() + ' Team');
-    if(!leader) {
+    if(team !== 'leader') {
         $gameGuessingValue.text('');
     }
     
@@ -261,7 +262,7 @@ function startingAnimation() {
                         $gameOverlay.fadeOut('500');
                         setTimeout(function() {
                             $gameStartNumbers.hide();
-                            if(leader) {
+                            if(team === 'leader') {
                                 $guessedCorrect.fadeIn();
                             }
                         }, 500);
@@ -285,6 +286,10 @@ function displayMessage(milliseconds, message) {
 // Exits game and displays the score at the end of the round
 function roundScore() {
 	transitionRight($gameFrame, $scoreFrame);
+	
+	var blueScore = parseInt($teamBlue.text());
+	var redScore  = parseInt($teamRed.text());
+	
 	setTimeout(function() {
 		confetti.start();
 	}, 600);
@@ -320,7 +325,7 @@ $joinGame.click(function() {
 /* Create Game */
 
 $startGameButton.click(function() {
-    leader = true;
+    team = 'leader';
     var roundTime = parseInt($roundTime.val(), 10);
     socket.emit('create game', {
         roundTime: roundTime
@@ -377,6 +382,7 @@ $joinGameForm.submit(function(event) {
 
     socket.on('join game response', function(success, playerData, gameData) {
         if(success) {
+			team = playerData.team;
             $joinGameError.fadeOut();
 
             // Prepare game
@@ -415,9 +421,16 @@ $gameStealRight.click(function() {
 $leaveGame.click(function() {
     socket.emit('leave game');
     $guessedCorrect.hide();
-    leader = false;
+    team = null;
 	
 	roundScore();
+});
+
+/* Game Score */
+
+$scoreLeave.click(function() {
+	confetti.clear();
+	transitionLeft($scoreFrame, $menuFrame);
 });
 
 // Update values
@@ -440,7 +453,7 @@ socket.on('team won', function(team) {
 });
 
 socket.on('reset round', function() {
-    if(leader) {
+    if(team === 'leader') {
         transitionLeft($gameFrame, $categoryFrame);
     }
 });
@@ -450,7 +463,7 @@ socket.on('team steal', function(teams) {
     setTimeout(function() {
         displayMessage(4000, teams.stealTeam.capitalize() + ' has the chance to steal the round.');
         $gameGuessingTeam.text(teams.stealTeam.capitalize() + ' Team');
-        if(leader) {
+        if(team === 'leader') {
             setTimeout(function() {
                 $gameStealWrong.fadeIn();
                 $gameStealRight.fadeIn();
