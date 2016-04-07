@@ -96,6 +96,28 @@ html, body {
     margin: 0 1em;
 }
 
+.menu-frame .menu-footer {
+	position: absolute;
+	width: 100%;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding-bottom: 1rem;
+}
+
+.menu-frame .menu-footer .most-awesome-guy-in-the-entire-world {
+	margin-left: 0.5rem;
+	font-weight: 300;
+}
+
+.menu-frame .menu-footer .halp {
+	margin-right: 0.5rem;
+}
+
 @media(max-width: 360px) {
 
     .menu-title h1 {
