@@ -528,6 +528,7 @@ html, body {
 	width: 100%;
 	
 	display: flex;
+	flex-direction: column;
 }
 
 .score-frame .scores .card {
@@ -538,6 +539,7 @@ html, body {
 	
 	height: 100%;
 	width: 100%;
+	margin: 0;
 	
 	border-radius: 0;
 }
@@ -554,15 +556,27 @@ html, body {
 .score-frame .score-footer {
 	position: absolute;
 	width: 100%;
+	height: 100%;
 	bottom: 0;
-	padding-bottom: 1rem;
 	
 	display: flex;
 	justify-content: center;
+	align-items: center;
 }
 
 .score-frame .score-footer .score-leave {
 	z-index: 10;
+}
+
+@media(min-width: 768px) {
+	.score-frame .scores {
+		flex-direction: row;
+	}
+	
+	.score-frame .score-footer {
+		align-items: flex-end;
+		padding-bottom: 1rem;
+	}
 }
 
 /* Spinner Frame */
