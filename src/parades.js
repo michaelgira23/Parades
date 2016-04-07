@@ -56,7 +56,6 @@ module.exports = function(io) {
                     });
 
                     socket.on('change value', function() {
-                        console.log('help')
                         if(permission === 1 && gameExists(gameId) && !game.inRound) {
                             game.drawValue();
                             game.emitGuessing();
@@ -71,7 +70,6 @@ module.exports = function(io) {
 
                     socket.on('guessed correct', function() {
                         if(permission === 1 && gameExists(gameId) && game.inRound) {
-                            console.log('guessed correct');
                             game.endRound();
                         }
                     });
@@ -165,7 +163,6 @@ function generateGameId() {
 
 /* Initializes game */
 function initializeGame(io, socketId, username, options) {
-    console.log('Initialize Game');
     var newGame = new Game(io, socketId, username, options);
     var id = newGame.gameId;
     games[id] = newGame;
@@ -186,7 +183,6 @@ function playerInGame(socketId) {
 /* Game "class" */
 
 function Game(io, socketId, username, options) {
-    console.log('Create game instance');
     this.io = io;
 
     // Game ID
@@ -215,6 +211,13 @@ function Game(io, socketId, username, options) {
         this.options.roundTime = 90;
     }
 
+	// Same Category
+	if(!options.sameCategory) {
+		this.options.sameCategory = false;
+	} else {
+		this.options.sameCategory = true;
+	}
+
     // General values
     this.score = {};
     this.score.blue = 0;
@@ -238,6 +241,8 @@ function Game(io, socketId, username, options) {
     this.emitStatus();
     this.emitPlayers();
     this.emitGuessing();
+	
+	console.log('Game created with the Game ID of ' + this.gameId);
 }
 
 // Returns a JSON containing stats about the current round
@@ -267,6 +272,17 @@ Game.prototype.emit = function(event, data) {
 // Emits something only to the leader
 Game.prototype.emitToLeader = function(event, data) {
     this.io.to(this.leaderId).emit(event, data);
+}
+
+// Emits something to everyone EXCEPT the leader
+Game.prototype.emitExceptLeader = function(event, data) {
+	var that = this;
+    var io = this.io;
+    _.each(this.players, function(value, key) {
+		if(key !== that.leaderId) {
+        	io.to(key).emit(event, data);
+		}
+    });
 }
 
 // Emit to leader category and value they're guessing
@@ -317,19 +333,16 @@ Game.prototype.chooseCategory = function() {
 
 // Draws a random value to guess, also chooses a category if it is unset
 Game.prototype.drawValue = function() {
-    console.log('draw value')
     if(typeof this.round.category === 'undefined') {
         this.chooseCategory();
     }
     this.round.guessing = categories.getRandomValue(this.round.category);
-    console.log('Draw value', this.round.guessing);
     return this.round.guessing;
 }
 
 // Starts a new round
 Game.prototype.startRound = function() {
     if(!this.inRound) {
-        console.log('Start Round');
         // this.emit is out of scope in setTimeout function
         var that = this;
 
@@ -359,21 +372,18 @@ Game.prototype.startRound = function() {
 Game.prototype.endRound = function() {
     if(this.inRound && typeof this.timer !== 'undefined') {
         
-        console.log('End Round');
         this.inRound = false;
         clearInterval(this.timer);
         this.emit('stop timer', this.round.currentTime);
 
         if(this.round.currentTime <= 0) {
             // Team lost
-            console.log(this.round.team + ' team lost the round')
             // Determine which team can "steal" the round
             if(this.round.team === 'blue') {
                 var stealTeam = 'red';
             } else {
                 var stealTeam = 'blue';
             }
-            console.log(stealTeam + ' is able to steal the round!');
             
             pendingStealResponse = stealTeam;
             this.emit('team steal', {
@@ -382,7 +392,6 @@ Game.prototype.endRound = function() {
             });
         } else {
             // Team won
-            console.log(this.round.team + ' guessed correctly!');
             this.emit('team won', this.round.team);
             
             this.score[this.round.team]++;
@@ -403,6 +412,9 @@ Game.prototype.resetRound = function() {
     } else {
         this.round.team = 'blue';
     }
+	if(!this.options.sameCategory) {
+		this.chooseCategory();
+	}
     this.drawValue();
     this.emitStatus();
     this.emitGuessing();
@@ -411,15 +423,14 @@ Game.prototype.resetRound = function() {
 
 // Stops the game
 Game.prototype.endGame = function() {
-    console.log('End game');
-    this.emit('end game');
+    this.emitExceptLeader('end game');
+	console.log('Game ' + this.gameId + ' ended! Final Score: Blue - ' + this.score.blue + ' Red - ' + this.score.red);
     delete games[this.gameId];
 }
 
 // Makes a player join a game
 Game.prototype.playerJoin = function(socket, username) {
-    console.log('Player ' + username + ' joined');
-
+	
     // Determine which team new guy should go on
     var blueCount = this.getTeam('blue').length;
     var redCount  = this.getTeam('red').length;
@@ -453,7 +464,6 @@ Game.prototype.playerChangeTeam = function(socketId, team) {
 
 // Makes a player leave a game
 Game.prototype.playerLeave = function(socketId) {
-    console.log('Player left');
     delete this.players[socketId];
     this.emitPlayers();
 }

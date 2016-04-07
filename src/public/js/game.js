@@ -42,6 +42,7 @@ var $usernameButton = $('.menu-frame .inputUsername button');
 var $createGameFrame = $('.createGame-frame');
 var $startGameButton = $('.createGame-frame .createGame-start');
 var $roundTime       = $('.createGame-frame .createGame-options .roundTime');
+var $sameCategory    = $('.createGame-frame .createGame-options .sameCategory');
 
 /* Game Code */
 var $gameCodeFrame  = $('.gameCode-frame');
@@ -63,6 +64,7 @@ var $guessingCategory  = $('.chooseCategory-frame .category .guessingCategory');
 var $guessingTeam      = $('.chooseCategory-frame .guessing .guessingTeam');
 var $guessingValue     = $('.chooseCategory-frame .guessing .guessingValue');
 var $guessingGameReady = $('.chooseCategory-frame .gameReady');
+var $guessingLeave     = $('.chooseCategory-frame .leaveGame');
 var $anotherCategory   = $('.chooseCategory-frame .anotherCategory');
 var $anotherValue      = $('.chooseCategory-frame .anotherValue');
 
@@ -162,7 +164,7 @@ function updateGameStatus(gameStatus) {
     $gameBlueScore.text(gameStatus.score.blue);
     $gameRedScore.text(gameStatus.score.red);
 
-    if(team === 'leader') {
+    if(team !== 'leader') {
         $gameGameCodeLabel.text('Leader is');
         $gameGameCode.text(gameStatus.leader.username);
     }
@@ -283,16 +285,21 @@ function displayMessage(milliseconds, message) {
     }, milliseconds);
 }
 
-// Exits game and displays the score at the end of the round
+// Leaves game and displays the score at the end of the game
 function roundScore() {
+	socket.emit('leave game');
 	transitionRight($gameFrame, $scoreFrame);
 	
-	var blueScore = parseInt($teamBlue.text());
-	var redScore  = parseInt($teamRed.text());
+	var blueScore = parseInt($gameBlueScore.text());
+	var redScore  = parseInt($gameRedScore.text());
 	
-	setTimeout(function() {
-		confetti.start();
-	}, 600);
+	// You only deserve the confetti if you win.
+	if((team === 'leader') || (team === 'blue' && blueScore >= redScore) || (team === 'red' && redScore >= blueScore)) {
+		setTimeout(function() {
+			confetti.start();
+		}, 600);
+	}
+	team = null;
 }
 
 /* Make the buttons work */
@@ -328,7 +335,8 @@ $startGameButton.click(function() {
     team = 'leader';
     var roundTime = parseInt($roundTime.val(), 10);
     socket.emit('create game', {
-        roundTime: roundTime
+        roundTime: roundTime,
+		sameCategory: $sameCategory.prop('checked'),
     });
 
     socket.on('game id', function(id) {
@@ -359,12 +367,15 @@ $guessingGameReady.click(function() {
     }, 800);
 });
 
+$guessingLeave.click(function() {
+	roundScore();
+});
+
 $anotherCategory.click(function() {
     socket.emit('change category');
 });
 
 $anotherValue.click(function() {
-    console.log('help')
     socket.emit('change value');
 });
 
@@ -419,18 +430,17 @@ $gameStealRight.click(function() {
 });
 
 $leaveGame.click(function() {
-    socket.emit('leave game');
-    $guessedCorrect.hide();
-    team = null;
-	
 	roundScore();
+	$guessedCorrect.hide();
+	$gameStealWrong.hide();
+	$gameStealRight.hide();
 });
 
 /* Game Score */
 
 $scoreLeave.click(function() {
 	confetti.clear();
-	transitionLeft($scoreFrame, $menuFrame);
+	showMenu();
 });
 
 // Update values
@@ -451,11 +461,16 @@ socket.on('stop timer', function(seconds) {
 socket.on('team won', function(team) {
     displayMessage(4000, team.capitalize() + ' Team won!');
 });
-
 socket.on('reset round', function() {
     if(team === 'leader') {
         transitionLeft($gameFrame, $categoryFrame);
     }
+});
+socket.on('end game', function() {
+	roundScore();
+	$guessedCorrect.hide();
+	$gameStealWrong.hide();
+	$gameStealRight.hide();
 });
 
 socket.on('team steal', function(teams) {
@@ -488,6 +503,9 @@ $usernameButton.prop('disabled', $usernameInput.val() === '');
 
 $joinGameButton.prop('disabled', $joinGameCode.val() === '');
 $joinGameError.hide();
+
+// Override Autocorrect
+$sameCategory.prop('checked', true);
 
 $guessedCorrect.hide();
 $gameOverlay.hide();
