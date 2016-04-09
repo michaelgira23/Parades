@@ -32,6 +32,37 @@ html, body {
     background-color: #E5E5E5;
 }
 
+/* Directions */
+
+.modal-content .modal-header .modal-title {
+    font-weight: 600;
+}
+
+.modal-content .modal-body h5 {
+    margin: 1.5rem 0;
+    text-align: center;
+    font-weight: 300;
+}
+
+.modal-content .modal-body h6 {
+    font-size: 1.5rem;
+    margin-top: 0.75rem;
+}
+
+.modal-content .modal-footer .proctor {
+    float: left;
+}
+
+.modal-content .modal-footer .michael {
+    float: right;
+}
+
+@media(min-width: 768px) {
+    .modal-content .modal-body h5 {
+        font-size: 2rem;
+    }
+}
+
 /* Individual Frames */
 
 .frame {
@@ -105,8 +136,8 @@ html, body {
 	
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-end;
-	padding-bottom: 1rem;
+	align-items: center;
+	padding-bottom: 0.5rem;
 }
 
 .menu-frame .menu-footer .most-awesome-guy-in-the-entire-world {

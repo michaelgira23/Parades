@@ -18,6 +18,33 @@
         <link rel="stylesheet" href="/parades/css/parades.css">
 	</head>
 	<body>
+        <!-- Directions Modal -->
+        <div id="directions" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="directions-title" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title" id="directions-title">What is Parades?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Pictionary + Charades = Parades</h5>
+                        <h6>Object</h6>
+                        <p>Parades (or Charictionary) is a combination of Pictionary and Charades. The object of the game is for each team to score the most points by correctly guessing what their teammate is trying to draw and/or act out.</p>
+                        <h6>Game</h6>
+                        <p>Each round, the two teams will alternate and select a representative. The host of the game will secretly draw a random category and value for said representative to draw/act. The round ends after a certain time limit or if the team guesses correctly. If a team guesses correctly, then they earn a point. <strong>A team may only guess what the value is if the person drawing/acting is from their team.</strong></p>
+                        <p><strong>If a team fails to guess what their teammate was trying to draw/act after the round, the other team has an opportunity to "steal" the round.</strong> They will be allowed one (1) guess what the other team was draw/acting out. If both teams fail, there will be no points given that round.</p>
+                        <h6>End</h6>
+                        <p>The game keeps on going until the game leader quits the game by pressing the "Leave Game" button. At that time, the team with the most points wins!</p>
+                    </div>
+                    <div class="modal-footer">
+                        <small class="proctor">Original game concept by <strong>Proctor</strong></small>
+                        <small class="michael">Game developed by <strong>Michael Gira</strong></small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Main Menu -->
         <div class="frame menu-frame">
@@ -37,7 +64,7 @@
             </form>
 			<div class="menu-footer">
 				<span class="most-awesome-guy-in-the-entire-world">Created by Michael Gira</span>
-				<button class="halp btn">
+				<button class="halp btn" data-toggle="modal" data-target="#directions">
 					<i class="fa fa-question-circle"></i>
 					What is Parades?
 				</button>
