@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+// Dynamically changes to io.connect('https://michaelgira.me', {path: "/parades/socket.io"}); on production
 var socket = io();
 var team = null;
 var timer;

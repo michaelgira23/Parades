@@ -1,0 +1,7 @@
+// Use this file as a template to create a config.js on each machine. DO NOT FILLE OUT DATA ON THIS EXAMPLE
+
+module.exports =
+{
+    port: 1418,
+    localhost: true
+};
