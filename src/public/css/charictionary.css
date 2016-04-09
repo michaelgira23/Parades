@@ -1,0 +1,50 @@
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800);
+
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+rect {
+    fill-opacity: 0;
+    stroke-width: 1rem;
+}
+
+.blue-bar {
+    stroke: #5882FA;
+}
+
+.red-bar {
+    stroke: #E9332D;
+    transition-duration: 3s;
+}
+
+.redirect-text, svg {
+    position: absolute;
+}
+
+.redirect-text {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.redirect-text * {
+    margin: 0;
+    line-height: 0.8em;
+}
+
+.redirect-text h3 {
+    font-size: 3rem;
+    font-weight: 300;
+}
+
+.redirect-text h1 {
+    font-size: 12rem;
+    font-weight: 800;
+}

@@ -23,6 +23,11 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/html/game.html');
 });
 
+// Take THAT Dawson!
+app.get('/charictionary', function(req, res) {
+	res.sendFile(__dirname + '/html/redirect.html');
+});
+
 server.listen(config.port, function() {
 	console.log('Server listening on *:' + config.port);
 });
