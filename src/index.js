@@ -23,9 +23,16 @@ app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/html/game.html');
 });
 
-// Take THAT Dawson!
+// Dawson we can compromise
 app.get('/charictionary', function(req, res) {
-	res.sendFile(__dirname + '/html/redirect.html');
+    console.log('Somebody joined with a Charictionary client...');
+	res.writeHeader(200, {'Content-Type': 'text/html'});
+    var file = fs.readFileSync(__dirname + '/html/game.html', 'utf-8');
+    // Swap 'Parades' and 'Charictionary'
+    file = file.split('Charictionary').join('[[Placeholder]]');
+    file = file.split('Parades').join('Charictionary');
+    file = file.split('[[Placeholder]]').join('Parades');
+    res.end(file);
 });
 
 server.listen(config.port, function() {
