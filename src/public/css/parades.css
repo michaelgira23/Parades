@@ -95,7 +95,7 @@ html, body {
     position: relative;
     top: -100%;
     margin-top: 0.75rem;
-    line-height: 0.8em;
+    line-height: 0.85em;
 }
 
 .menu-frame .menu-selections {
@@ -151,16 +151,16 @@ html, body {
 
 @media(max-width: 360px) {
 
-    .menu-title h1 {
-        font-size: 5rem;
+    .menu-frame .menu-title h1 {
+        font-size: 3rem;
     }
 
-    .menu-selections div:first-child {
+    .menu-frame .menu-selections div:first-child {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
     }
 
-    .menu-selections div:last-child {
+    .menu-frame .menu-selections div:last-child {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
 
@@ -175,6 +175,12 @@ html, body {
 
     .menu-frame .menu-selections div:last-child {
         animation-delay: 0.5s;
+    }
+}
+
+@media(max-width: 677px) {
+    .menu-frame .menu-title h1 {
+        font-size: 3.5rem;
     }
 }
 
