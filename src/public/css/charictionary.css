@@ -37,14 +37,26 @@ rect {
 .redirect-text * {
     margin: 0;
     line-height: 0.8em;
+    text-align: center;
 }
 
 .redirect-text h3 {
-    font-size: 3rem;
+    font-size: 1.5rem;
     font-weight: 300;
 }
 
 .redirect-text h1 {
-    font-size: 12rem;
+    font-size: 20vw;
     font-weight: 800;
+}
+
+@media(min-width: 768px) {
+    
+    .redirect-text h3 {
+        font-size: 3rem;
+    }
+    
+    .redirect-text h1 {
+        font-size: 12rem;
+    }
 }
