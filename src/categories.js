@@ -6,24 +6,35 @@ var _      = require('underscore');
 var categories =
 {
 	'Superheroes': [
-		'Supermanny',
-		'Manbat',
-		'Spooderman',
-		'Phil',
-		'Arm-fall-off-man',
+		'Squirrel Girl',
+		'The Dog-Welder',
+		'Big Bertha',
+		'Howard the Duck',
+		'Brother Power the Geek',
+		'Dazzler'
 	],
 
 	'Cool people': [
 		'Not parker',
 		'Michael',
-        'Surprisingly, Michael',
+        'Surprisingly, Michael'
 	],
 
-    'Weird Song': [
-        'Song 1',
-        'Song 2',
-        'Everything in Dawson\'s playlist',
+    'Oldie Music': [
+        'Old Time Rock and Roll',
+        'Yellow Submarine',
+        'White Room',
+		'Pinball Wizard',
+		'Like a Rolling Stone'
     ],
+	
+	'Memes': [
+		'Pepe',
+		'Spoodermen',
+		'None of my business',
+		'Most interesting man alive',
+		'Willy Wonka'
+	]
 };
 
 /* Returns an array of categories */
